@@ -9,3 +9,4 @@ class SampleModel(models.Model):
     value = models.IntegerField()
     not_editable = models.IntegerField(editable=False)
     created = models.DateTimeField(auto_now_add=True)
+    foreign_key = models.ForeignKey(OtherModel, null=False, blank=False)

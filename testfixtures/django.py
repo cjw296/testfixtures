@@ -1,7 +1,12 @@
 from  __future__ import absolute_import
 from functools import partial
 
+from django.conf import settings
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
+from django.db.migrations.loader import MigrationLoader
 from django.db.models import Model
+from django.test import TransactionTestCase
 
 from .comparison import _compare_mapping, register
 from . import compare as base_compare
@@ -58,3 +63,36 @@ register(Model, compare_model)
 
 
 compare = partial(base_compare, ignore_eq=True)
+
+
+class MigrationTestCase(TransactionTestCase):
+    """A Test case for testing migrations"""
+
+    # These must be defined by subclasses.
+    migrate_from = None
+    migrate_to = None
+
+    def setUp(self):
+        self.existing_state = settings.MIGRATION_MODULES.disabled
+        settings.MIGRATION_MODULES.disabled = False
+        super(MigrationTestCase, self).setUp()
+        self.executor = MigrationExecutor(connection)
+        # fake starting point:
+        self.start = self.executor.loader.graph.leaf_nodes()
+        self.executor.migrate(self.start, fake=True)
+        self.executor.loader = MigrationLoader(connection)
+        # migrate to where we want to start from
+        self.executor.migrate(self.migrate_from)
+        # store the old and new app states
+        self.old_apps = self.executor.loader.project_state(self.migrate_from).apps
+        self.new_apps = self.executor.loader.project_state(self.migrate_to).apps
+
+    def tearDown(self):
+        executor = MigrationExecutor(connection)
+        executor.migrate(self.start)
+        super(MigrationTestCase, self).tearDown()
+        settings.MIGRATION_MODULES.disabled = self.existing_state
+
+    def migrate_to_dest(self):
+        self.executor.loader.build_graph()  # reload.
+        self.executor.migrate(self.migrate_to)

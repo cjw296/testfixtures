@@ -4,9 +4,9 @@ import pytest
 from django.contrib.auth.models import User
 from testfixtures import OutputCapture, Replacer
 from testfixtures.compat import PY3
-from .models import SampleModel
 from testfixtures.tests.test_django.manage import main
 
+from .models import SampleModel
 from ..test_compare import CompareHelper
 from ... import compare
 from ...django import compare as django_compare
