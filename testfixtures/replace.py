@@ -1,4 +1,6 @@
 from functools import partial
+from gc import get_referrers, collect
+
 from testfixtures.compat import ClassType
 from testfixtures.resolve import resolve, not_there
 from testfixtures.utils import wrap, extend_docstring
@@ -139,3 +141,35 @@ replace_params_doc = """
 # add the param docs, so we only have one copy of them!
 extend_docstring(replace_params_doc,
                  [Replacer.__call__, Replacer.replace, replace, Replace])
+
+
+class ReplaceEverywhere(object):
+
+    def __init__(self, target, replacement):
+        self.target = target
+        self.replacement = replacement
+        self._replaced = []
+
+    def _replace(self, o, target_key, replacement_key):
+        print(repr(o)[:50])
+        for key, value in o.items():
+            print(key, ' ', end='')
+            if value is getattr(self, target_key):
+                print('found')
+                o[key] = getattr(self, replacement_key)
+            else:
+                print('skipped')
+
+    def __enter__(self):
+        for o in get_referrers(self.target):
+            if o is self.__dict__:
+                continue
+            assert isinstance(o, dict), 'Cannot replace in '+str(type(o))
+            self._replace(o, 'target', 'replacement')
+            self._replaced.append(o)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print('RESTORE')
+        for o in self._replaced:
+            self._replace(o, 'replacement', 'target')
+        self._replaced = []
