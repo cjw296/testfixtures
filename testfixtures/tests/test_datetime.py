@@ -454,11 +454,11 @@ class TestDateTime(TestCase):
         mock_dt.tick(hours=1)
         compare(mock_dt.now(), expected=d(2001, 1, 1, 1, 0, 10))
 #
-#     def test_tick_with_timedelta_instance(self):
-#         datetime = mock_datetime(delta=0)
-#         compare(datetime.now(), expected=d(2001, 1, 1))
-#         datetime.tick(timedelta(hours=1))
-#         compare(datetime.now(), expected=d(2001, 1, 1, 1))
+    def test_tick_with_timedelta_instance(self) -> None:
+        mock_dt = mock_datetime(delta=0)
+        compare(mock_dt.now(), expected=d(2001, 1, 1))
+        mock_dt.tick(timedelta(hours=1))
+        compare(mock_dt.now(), expected=d(2001, 1, 1, 1))
 #
 #     def test_old_import(self):
 #         from testfixtures import test_datetime
