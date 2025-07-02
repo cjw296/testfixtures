@@ -390,11 +390,11 @@ class TestDateTime(TestCase):
         mock_dt.add(2001, 1, 1)
         assert type(mock_dt.now()) is mock_dt
 #
-#     def test_non_strict_add(self):
-#         from datetime import datetime
-#         mock_dt = mock_datetime(None, strict=False)
-#         mock_dt.add(2001, 1, 1)
-#         assert type(mock_dt.now()) is datetime
+    def test_non_strict_add(self) -> None:
+        from datetime import datetime
+        mock_dt = mock_datetime(None, strict=False)
+        mock_dt.add(2001, 1, 1)
+        assert type(mock_dt.now()) is datetime
 #
 #     @replace('datetime.datetime', mock_datetime())
 #     def test_isinstance_default(self):
