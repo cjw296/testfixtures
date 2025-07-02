@@ -138,20 +138,20 @@ class TestDateTime(TestCase):
         compare(datetime.now(), d(2002, 1, 1, 3, 0, 10))
         compare(datetime.now(), d(2002, 1, 1, 3, 0, 30))
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_add_datetime_supplied(self, t: type[MockDateTime]):
-#         from datetime import datetime
-#         t.add(d(2002, 1, 1, 1))
-#         t.add(datetime(2002, 1, 1, 2))
-#         compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
-#         compare(datetime.now(), d(2002, 1, 1, 2, 0, 0))
-#         tzinfo = SampleTZInfo()
-#         tzrepr = repr(tzinfo)
-#         with ShouldRaise(ValueError(
-#             'Cannot add datetime with tzinfo of %s as configured to use None' %(
-#                 tzrepr
-#             ))):
-#             t.add(d(2001, 1, 1, tzinfo=tzinfo))
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_add_datetime_supplied(self, t: type[MockDateTime]) -> None:
+        from datetime import datetime
+        t.add(d(2002, 1, 1, 1))
+        t.add(datetime(2002, 1, 1, 2))
+        compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
+        compare(datetime.now(), d(2002, 1, 1, 2, 0, 0))
+        tzinfo = SampleTZInfo()
+        tzrepr = repr(tzinfo)
+        with ShouldRaise(ValueError(
+            'Cannot add datetime with tzinfo of %s as configured to use None' %(
+                tzrepr
+            ))):
+            t.add(d(2001, 1, 1, tzinfo=tzinfo))
 #
 #     def test_instantiate_with_datetime(self):
 #         from datetime import datetime
