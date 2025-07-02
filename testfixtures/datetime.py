@@ -59,6 +59,23 @@ class MockedCurrent:
             cls._mock_class = cls if strict else cls._mock_base_class
             cls._mock_tzinfo = tzinfo
             cls._mock_date_type = date_type
+
+    @classmethod
+    def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
+        # Simple implementation: create datetime and add to queue
+        if args and isinstance(args[0], (datetime, date)):
+            instance = args[0]
+        else:
+            # Create datetime from int args - ensure we have at least year, month, day
+            int_args = [arg for arg in args if isinstance(arg, int)]
+            while len(int_args) < 3:
+                int_args.extend([2001, 1, 1][:3-len(int_args)])
+            instance = datetime(int_args[0], int_args[1], int_args[2],
+                              int_args[3] if len(int_args) > 3 else 0,
+                              int_args[4] if len(int_args) > 4 else 0,
+                              int_args[5] if len(int_args) > 5 else 0,
+                              int_args[6] if len(int_args) > 6 else 0)
+        cls._mock_queue.append(instance)
 #
 #     @classmethod
 #     def add(cls, *args, **kw):
@@ -133,18 +150,7 @@ def mock_factory(
     if args != (None,):
         if not (args or kw):
             args = default
-        # Create initial datetime and add to queue
-        if args:
-            # Convert args to ints for datetime constructor
-            datetime_args = [int(arg) if isinstance(arg, int) else 2001 for arg in args[:7]]
-            while len(datetime_args) < 3:  # Need at least year, month, day
-                datetime_args.extend([1, 1, 0, 0, 0][:3-len(datetime_args)])
-            initial_dt = datetime(datetime_args[0], datetime_args[1], datetime_args[2],
-                                 datetime_args[3] if len(datetime_args) > 3 else 0,
-                                 datetime_args[4] if len(datetime_args) > 4 else 0,
-                                 datetime_args[5] if len(datetime_args) > 5 else 0,
-                                 datetime_args[6] if len(datetime_args) > 6 else 0)
-            cls._mock_queue.append(initial_dt)
+        cls.add(*args, **kw)  # type: ignore[arg-type]
 
     return cls
 #
