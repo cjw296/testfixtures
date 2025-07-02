@@ -385,10 +385,10 @@ class TestDateTime(TestCase):
         dt = mock_dt(2001, 1, 1) + timedelta(days=1)
         assert type(dt) is datetime
 #
-#     def test_strict_add(self):
-#         mock_dt = mock_datetime(None, strict=True)
-#         mock_dt.add(2001, 1, 1)
-#         assert type(mock_dt.now()) is mock_dt
+    def test_strict_add(self) -> None:
+        mock_dt = mock_datetime(None, strict=True)
+        mock_dt.add(2001, 1, 1)
+        assert type(mock_dt.now()) is mock_dt
 #
 #     def test_non_strict_add(self):
 #         from datetime import datetime
