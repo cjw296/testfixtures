@@ -153,10 +153,10 @@ class TestDateTime(TestCase):
             ))):
             t.add(d(2001, 1, 1, tzinfo=tzinfo))
 #
-#     def test_instantiate_with_datetime(self):
-#         from datetime import datetime
-#         t = mock_datetime(datetime(2002, 1, 1, 1))
-#         compare(t.now(), d(2002, 1, 1, 1, 0, 0))
+    def test_instantiate_with_datetime(self) -> None:
+        from datetime import datetime
+        t = mock_datetime(datetime(2002, 1, 1, 1))
+        compare(t.now(), d(2002, 1, 1, 1, 0, 0))
 #
 #     @replace('datetime.datetime', mock_datetime(None))
 #     def test_now_requested_longer_than_supplied(self, t: type[MockDateTime]):
