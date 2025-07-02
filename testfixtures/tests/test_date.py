@@ -215,27 +215,24 @@ class TestDate(TestCase):
 #             self.assertTrue(isinstance(inst, d), inst)
 #             self.assertFalse(inst.__class__ is d, inst)
 #
-#     def test_strict_addition(self):
-#         mock_d = mock_date(strict=True)
-#         dt = mock_d(2001, 1, 1) + timedelta(days=1)
-#         assert type(dt) is mock_d
-#
-#     def test_non_strict_addition(self):
-#         from datetime import date
-#         mock_d = mock_date(strict=False)
-#         dt = mock_d(2001, 1, 1) + timedelta(days=1)
-#         assert type(dt) is date
-#
-#     def test_strict_add(self):
-#         mock_d = mock_date(None, strict=True)
-#         mock_d.add(2001, 1, 1)
-#         assert type(mock_d.today()) is mock_d
-#
-#     def test_non_strict_add(self):
-#         from datetime import date
-#         mock_d = mock_date(None, strict=False)
-#         mock_d.add(2001, 1, 1)
-#         assert type(mock_d.today()) is date
+    def test_strict_addition(self) -> None:
+        mock_d = mock_date(strict=True)
+        dt = mock_d(2001, 1, 1) + timedelta(days=1)
+        assert type(dt) is mock_d
+    def test_non_strict_addition(self) -> None:
+        from datetime import date
+        mock_d = mock_date(strict=False)
+        dt = mock_d(2001, 1, 1) + timedelta(days=1)
+        assert type(dt) is date
+    def test_strict_add(self) -> None:
+        mock_d = mock_date(None, strict=True)
+        mock_d.add(2001, 1, 1)
+        assert type(mock_d.today()) is mock_d
+    def test_non_strict_add(self) -> None:
+        from datetime import date
+        mock_d = mock_date(None, strict=False)
+        mock_d.add(2001, 1, 1)
+        assert type(mock_d.today()) is date
 #
 #     @replace('datetime.date', mock_date())
 #     def test_isinstance_default(self):
