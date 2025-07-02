@@ -235,15 +235,15 @@ class TestDateTime(TestCase):
         compare(datetime.now(), d(2001, 1, 1, 0, 10, 0))
         compare(datetime.now(), d(2001, 1, 1, 0, 30, 0))
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_set(self):
-#         from datetime import datetime
-#         datetime = cast(type[MockDateTime], datetime)
-#         datetime.set(2001, 1, 1, 1, 0, 1)
-#         compare(datetime.now(), d(2001, 1, 1, 1, 0, 1))
-#         datetime.set(2002, 1, 1, 1, 0, 0)
-#         compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
-#         compare(datetime.now(), d(2002, 1, 1, 1, 0, 20))
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_set(self) -> None:
+        from datetime import datetime
+        dt_mock = cast(type[MockDateTime], datetime)
+        dt_mock.set(2001, 1, 1, 1, 0, 1)
+        compare(datetime.now(), d(2001, 1, 1, 1, 0, 1))
+        dt_mock.set(2002, 1, 1, 1, 0, 0)
+        compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
+        compare(datetime.now(), d(2002, 1, 1, 1, 0, 20))
 #
 #     @replace('datetime.datetime', mock_datetime(None))
 #     def test_set_datetime_supplied(self, t: type[MockDateTime]):
