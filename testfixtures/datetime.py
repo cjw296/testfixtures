@@ -737,13 +737,27 @@ def mock_date(
         delta_type=delta_type,
         strict=strict,
         ))
-#
-#
-# ms = 10**6
-#
-#
-# class MockTime(MockedCurrent, datetime):
-#
+
+
+ms = 10**6
+
+
+class MockTime(MockedCurrent, datetime):
+
+    def __new__(cls, *args: int, **kw: int) -> Self | float:  # type: ignore[misc]
+        """
+        Return a :class:`float` representing the mocked current time as would normally
+        be returned by :func:`time.time`.
+        """
+        if args or kw:
+            # Used when adding stuff to the queue
+            return super().__new__(cls, *args, **kw)  # type: ignore[misc]
+        else:
+            instance = cast(datetime, cls._mock_queue.next())
+            time: float = timegm(instance.utctimetuple())
+            time += (float(instance.microsecond)/ms)
+            return time
+
 #     @overload
 #     @classmethod
 #     def add(
@@ -901,52 +915,18 @@ def mock_date(
 #     ...
 #
 #
-# def mock_time(*args, delta: float | None = None, delta_type: str = 'seconds', **kw) -> type[MockTime]:
-#     """
-#     .. currentmodule:: testfixtures.datetime
-#
-#     A function that returns a :class:`mock object <testfixtures.datetime.MockTime>` that can be
-#     used in place of the :func:`time.time` function but where the return value can be
-#     controlled.
-#
-#     If a single positional argument of ``None`` is passed, then the
-#     queue of times to be returned will be empty and you will need to
-#     call :meth:`~MockTime.set` or :meth:`~MockTime.add` before calling
-#     the mock.
-#
-#     If an instance of :class:`~datetime.datetime` is passed as a single
-#     positional argument, that will be used to create the first time returned.
-#
-#     :param year: An optional year used to create the first time returned.
-#
-#     :param month: An optional month used to create the first time.
-#
-#     :param day: An optional day used to create the first time.
-#
-#     :param hour: An optional hour used to create the first time.
-#
-#     :param minute: An optional minute used to create the first time.
-#
-#     :param second: An optional second used to create the first time.
-#
-#     :param microsecond: An optional microsecond used to create the first time.
-#
-#     :param delta:
-#       The size of the delta to use between values returned.
-#       If not specified, it will increase by 1 with each call to the mock.
-#
-#     :param delta_type:
-#       The type of the delta to use between values returned.
-#       This can be any keyword parameter accepted by the :class:`~datetime.timedelta` constructor.
-#
-#     The :meth:`~testfixtures.datetime.MockTime.add`, :meth:`~testfixtures.datetime.MockTime.set`
-#     and :meth:`~testfixtures.datetime.MockTime.tick` methods on the mock can be used to
-#     control the return values.
-#     """
-#     if 'tzinfo' in kw or len(args) > 7 or (args and getattr(args[0], 'tzinfo', None)):
-#         raise TypeError("You don't want to use tzinfo with test_time")
-#     return cast(type[MockTime], mock_factory(
-#         'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), args, kw,
-#         delta=delta,
-#         delta_type=delta_type,
-#         ))
+def mock_time(*args: int | datetime | None, delta: float | None = None, delta_type: str = 'seconds', **kw: int) -> type[MockTime]:
+    """
+    .. currentmodule:: testfixtures.datetime
+
+    A function that returns a :class:`mock object <testfixtures.datetime.MockTime>` that can be
+    used in place of the :func:`time.time` function but where the return value can be
+    controlled.
+    """
+    if 'tzinfo' in kw or len(args) > 7 or (args and getattr(args[0], 'tzinfo', None)):
+        raise TypeError("You don't want to use tzinfo with test_time")
+    return cast(type[MockTime], mock_factory(
+        'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), args, cast(dict[str, int | TZInfo | None], kw),
+        delta=delta,
+        delta_type=delta_type,
+        ))

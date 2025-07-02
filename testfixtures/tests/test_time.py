@@ -2,19 +2,19 @@ from datetime import timedelta
 from typing import cast
 from unittest import TestCase
 
-# from testfixtures import mock_time, replace, compare, ShouldRaise
-# from .test_datetime import SampleTZInfo
-# from ..datetime import MockTime
-#
-#
-# class TestTime(TestCase):
-#
-#     @replace('time.time', mock_time())
-#     def test_time_call(self):
-#         from time import time
-#         compare(time(), 978307200.0)
-#         compare(time(), 978307201.0)
-#         compare(time(), 978307203.0)
+from testfixtures import mock_time, replace, compare, ShouldRaise
+from .test_datetime import SampleTZInfo
+from testfixtures.datetime import MockTime
+
+
+class TestTime(TestCase):
+
+    @replace('time.time', mock_time())
+    def test_time_call(self) -> None:
+        from time import time
+        compare(time(), 978307200.0)
+        compare(time(), 978307201.0)
+        compare(time(), 978307203.0)
 #
 #     @replace('time.time', mock_time(2002, 1, 1, 1, 2, 3))
 #     def test_time_supplied(self):
