@@ -12,7 +12,7 @@ from testfixtures import (
     # mock_date,
     replace,
 )
-# from testfixtures.datetime import MockDateTime
+from testfixtures.datetime import MockDateTime
 # from testfixtures.tests import sample1
 from unittest import TestCase
 #
@@ -118,15 +118,15 @@ class TestDateTime(TestCase):
         from datetime import datetime
         compare(datetime.now(), d(2002, 1, 1, 1, 2, 3))
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_now_sequence(self, t):
-#         t.add(2002, 1, 1, 1, 0, 0)
-#         t.add(2002, 1, 1, 2, 0, 0)
-#         t.add(2002, 1, 1, 3, 0, 0)
-#         from datetime import datetime
-#         compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
-#         compare(datetime.now(), d(2002, 1, 1, 2, 0, 0))
-#         compare(datetime.now(), d(2002, 1, 1, 3, 0, 0))
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_now_sequence(self, t: type[MockDateTime]) -> None:
+        t.add(2002, 1, 1, 1, 0, 0)
+        t.add(2002, 1, 1, 2, 0, 0)
+        t.add(2002, 1, 1, 3, 0, 0)
+        from datetime import datetime
+        compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
+        compare(datetime.now(), d(2002, 1, 1, 2, 0, 0))
+        compare(datetime.now(), d(2002, 1, 1, 3, 0, 0))
 #
 #     @replace('datetime.datetime', mock_datetime())
 #     def test_add_and_set(self, t):
