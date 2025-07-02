@@ -16,7 +16,7 @@ from testfixtures.datetime import MockDateTime
 from testfixtures.tests import sample1
 from unittest import TestCase
 
-#
+
 class SampleTZInfo(tzinfo):
 
     def tzname(self, dt: datetime | None) -> str:
@@ -52,7 +52,7 @@ class WeirdTZInfo(tzinfo):
     def dst(self, dt: datetime | None) -> timedelta | None:
         return None
 
-#
+
 def test_sample_tzinfos() -> None:
     compare(SampleTZInfo().tzname(None), expected='SAMPLE')
     compare(SampleTZInfo2().tzname(None), expected='SAMPLE2')
@@ -60,7 +60,7 @@ def test_sample_tzinfos() -> None:
     compare(WeirdTZInfo().utcoffset(datetime(1, 2, 3)), expected=None)
     compare(WeirdTZInfo().dst(datetime(1, 2, 3)), expected=None)
 
-#
+
 class TestDateTime(TestCase):
 
     @replace('datetime.datetime', mock_datetime())
