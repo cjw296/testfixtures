@@ -130,24 +130,24 @@ class TestTime(TestCase):
         time_mock.add(year=2001, month=1, day=1, hour=1, second=1)
         compare(time(), 978310801.0)
 #
-#     @replace('time.time', mock_time(None))
-#     def test_add_tzinfo_kw(self):
-#         from time import time
-#         time = cast(type[MockTime], time)
-#         with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
-#             time.add(year=2001, tzinfo=SampleTZInfo())
+    @replace('time.time', mock_time(None))
+    def test_add_tzinfo_kw(self) -> None:
+        from time import time
+        time_mock = cast(type[MockTime], time)
+        with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
+            time_mock.add(year=2001, tzinfo=SampleTZInfo())
 #
-#     @replace('time.time', mock_time(None))
-#     def test_add_tzinfo_args(self):
-#         from time import time
-#         time = cast(type[MockTime], time)
-#         with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
-#             time.add(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo())
+    @replace('time.time', mock_time(None))
+    def test_add_tzinfo_args(self) -> None:
+        from time import time
+        time_mock = cast(type[MockTime], time)
+        with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
+            time_mock.add(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo())  # type: ignore[arg-type]
 #
-#     @replace('time.time', mock_time(2001, 1, 2, 3, 4, 5, 600000))
-#     def test_max_number_args(self):
-#         from time import time
-#         compare(time(), 978404645.6)
+    @replace('time.time', mock_time(2001, 1, 2, 3, 4, 5, 600000))
+    def test_max_number_args(self) -> None:
+        from time import time
+        compare(time(), 978404645.6)
 #
 #     def test_max_number_tzinfo(self):
 #         with ShouldRaise(TypeError(
