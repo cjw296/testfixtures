@@ -1,10 +1,6 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Tuple, cast, overload
-try:
-    from typing import Self
-except ImportError:
-    from typing_extensions import Self
+from typing import Callable, Self, Tuple, cast, overload
 
 
 class Queue(list[datetime | date]):
