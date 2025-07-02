@@ -113,10 +113,10 @@ class TestDateTime(TestCase):
         info = SampleTZInfo()
         compare(dt.now(info), d(2001, 1, 1, tzinfo=info))
 #
-#     @replace('datetime.datetime', mock_datetime(2002, 1, 1, 1, 2, 3))
-#     def test_now_supplied(self):
-#         from datetime import datetime
-#         compare(datetime.now(), d(2002, 1, 1, 1, 2, 3))
+    @replace('datetime.datetime', mock_datetime(2002, 1, 1, 1, 2, 3))
+    def test_now_supplied(self) -> None:
+        from datetime import datetime
+        compare(datetime.now(), d(2002, 1, 1, 1, 2, 3))
 #
 #     @replace('datetime.datetime', mock_datetime(None))
 #     def test_now_sequence(self, t):
