@@ -1,6 +1,6 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Self, Tuple, cast, overload, TypeVar, Generic
+from typing import Callable, Self, Tuple, overload, TypeVar, Generic
 
 T = TypeVar('T', bound=datetime | date)
 
@@ -63,7 +63,7 @@ class MockedCurrent(Generic[T]):
         if 'tzinfo' in kw or len(args) > 7:
             raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
         if args and isinstance(args[0], cls._mock_base_class):
-            instance = cast(T, args[0])
+            instance = args[0]
             instance_tzinfo = getattr(instance, 'tzinfo', None)
             if instance_tzinfo:
                 if instance_tzinfo != cls._mock_tzinfo:
@@ -71,12 +71,11 @@ class MockedCurrent(Generic[T]):
                         'Cannot add %s with tzinfo of %s as configured to use %s' % (
                             instance.__class__.__name__, instance_tzinfo, cls._mock_tzinfo
                         ))
-                instance = cast(T, instance.replace(tzinfo=None))  # type: ignore[union-attr,call-arg]
+                instance = instance.replace(tzinfo=None)  # type: ignore[attr-defined]
             if cls._correct_mock_type:
                 instance = cls._correct_mock_type(instance)
         else:
-            # For int args, create instance through the mock base class
-            instance = cast(T, cls._mock_base_class(*args, **kw))
+            instance = cls(*args, **kw)  # type: ignore[arg-type]
         cls._mock_queue.append(instance)
 
     @classmethod
@@ -118,7 +117,7 @@ def mock_factory(
         tzinfo: TZInfo | None = None,
         strict: bool = False
 ) -> type[MockedCurrent[T]]:
-    cls = cast(type[MockedCurrent[T]], type(
+    cls = type(
         type_name,
         (mock_class,),
         {},
@@ -127,12 +126,12 @@ def mock_factory(
         strict=strict,
         tzinfo=tzinfo,
         date_type=date_type,
-    ))
+    )
 
     if args != (None,):
         if not (args or kw):
             args = default
-        cls.add(*args, **kw)  # type: ignore[arg-type]
+        cls.add(*args, **kw)  # type: ignore[attr-defined]
 
     return cls
 
@@ -244,7 +243,7 @@ class MockDateTime(MockedCurrent[datetime], datetime):
 
     @classmethod  
     def _correct_mock_type(cls, instance: datetime) -> Self:
-        return cast(Self, cls._mock_class(
+        return cls._mock_class(
             instance.year,
             instance.month,
             instance.day,
@@ -253,7 +252,7 @@ class MockDateTime(MockedCurrent[datetime], datetime):
             instance.second,
             instance.microsecond,
             instance.tzinfo,
-        ))
+        )
 
 
     @classmethod
@@ -434,7 +433,7 @@ def mock_datetime(
         args = args[:7]
     else:
         tzinfo = tzinfo or (getattr(args[0], 'tzinfo', None) if args else None)
-    return cast(type[MockDateTime], mock_factory(
+    return mock_factory(
         'MockDateTime',
         MockDateTime,
         (2001, 1, 1, 0, 0, 0),
@@ -446,18 +445,18 @@ def mock_datetime(
         delta_type=delta_type,
         date_type=date_type,
         strict=strict,
-        ))
+    )  # type: ignore[return-value]
 
 
 class MockDate(MockedCurrent[date], date):
 
     @classmethod
     def _correct_mock_type(cls, instance: date) -> Self:
-        return cast(Self, cls._mock_class(
+        return cls._mock_class(
             instance.year,
             instance.month,
             instance.day,
-        ))
+        )
 
 
 #     @overload
@@ -648,12 +647,12 @@ def mock_date(
     The mock returned will behave exactly as the :class:`datetime.date` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDate`.
     """
-    return cast(type[MockDate], mock_factory(
-        'MockDate', MockDate, (2001, 1, 1), args, cast(dict[str, int | TZInfo | None], kw),
+    return mock_factory(
+        'MockDate', MockDate, (2001, 1, 1), args, kw,  # type: ignore[arg-type]
         delta=delta,
         delta_type=delta_type,
         strict=strict,
-        ))
+    )  # type: ignore[return-value]
 
 
 ms = 10**6
@@ -868,8 +867,8 @@ def mock_time(
     """
     if 'tzinfo' in kw or len(args) > 7 or (args and getattr(args[0], 'tzinfo', None)):
         raise TypeError("You don't want to use tzinfo with test_time")
-    return cast(type[MockTime], mock_factory(
-        'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), args, cast(dict[str, int | TZInfo | None], kw),
+    return mock_factory(
+        'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), args, kw,  # type: ignore[arg-type]
         delta=delta,
         delta_type=delta_type,
-        ))
+    )  # type: ignore[return-value]
