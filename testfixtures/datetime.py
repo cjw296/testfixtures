@@ -554,7 +554,7 @@ class MockDate(MockedCurrent[date], date):
         internal queue, rather than the actual current date.
 
         """
-        return cls._correct_mock_type(cls._mock_queue.next())
+        return cls._mock_queue.next()  # type: ignore[return-value]
 
 
 # @overload
