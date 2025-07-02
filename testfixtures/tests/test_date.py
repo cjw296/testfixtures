@@ -38,38 +38,34 @@ class TestDate(TestCase):
         compare(date.today(), d(2002, 1, 1))
         compare(date.today(), d(2002, 1, 2))
         compare(date.today(), d(2002, 1, 3))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_today_requested_longer_than_supplied(self, t: type[MockDate]):
-#         t.add(2002, 1, 1)
-#         t.add(2002, 1, 2)
-#         from datetime import date
-#         compare(date.today(), d(2002, 1, 1))
-#         compare(date.today(), d(2002, 1, 2))
-#         compare(date.today(), d(2002, 1, 3))
-#         compare(date.today(), d(2002, 1, 5))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_add_date_supplied(self):
-#         from datetime import date
-#         date = cast(type[MockDate], date)
-#         date.add(d(2001, 1, 2))
-#         date.add(date(2001, 1, 3))
-#         compare(date.today(), d(2001, 1, 2))
-#         compare(date.today(), d(2001, 1, 3))
-#
-#     def test_instantiate_with_date(self):
-#         from datetime import date
-#         t = mock_date(date(2002, 1, 1))
-#         compare(t.today(), d(2002, 1, 1))
-#
-#     @replace('datetime.date', mock_date(strict=True))
-#     def test_call(self, t: type[MockDate]):
-#         compare(t(2002, 1, 2), d(2002, 1, 2))
-#         from datetime import date
-#         dt = date(2003, 2, 1)
-#         self.assertFalse(dt.__class__ is d)
-#         compare(dt, d(2003, 2, 1))
+    @replace('datetime.date', mock_date(None))
+    def test_today_requested_longer_than_supplied(self, t: type[MockDate]) -> None:
+        t.add(2002, 1, 1)
+        t.add(2002, 1, 2)
+        from datetime import date
+        compare(date.today(), d(2002, 1, 1))
+        compare(date.today(), d(2002, 1, 2))
+        compare(date.today(), d(2002, 1, 3))
+        compare(date.today(), d(2002, 1, 5))
+    @replace('datetime.date', mock_date(None))
+    def test_add_date_supplied(self) -> None:
+        from datetime import date
+        date = cast(type[MockDate], date)
+        date.add(d(2001, 1, 2))
+        date.add(date(2001, 1, 3))
+        compare(date.today(), d(2001, 1, 2))
+        compare(date.today(), d(2001, 1, 3))
+    def test_instantiate_with_date(self) -> None:
+        from datetime import date
+        t = mock_date(date(2002, 1, 1))
+        compare(t.today(), d(2002, 1, 1))
+    @replace('datetime.date', mock_date(strict=True))
+    def test_call(self, t: type[MockDate]) -> None:
+        compare(t(2002, 1, 2), d(2002, 1, 2))
+        from datetime import date
+        dt = date(2003, 2, 1)
+        self.assertFalse(dt.__class__ is d)
+        compare(dt, d(2003, 2, 1))
 #
 #     def test_gotcha_import(self):
 #         # standard `replace` caveat, make sure you
@@ -145,34 +141,31 @@ class TestDate(TestCase):
 #         finally:
 #             r.restore()
 #
-#     @replace('datetime.date', mock_date())
-#     def test_repr(self):
-#         from datetime import date
-#         compare(repr(date), "<class 'testfixtures.datetime.MockDate'>")
-#
-#     @replace('datetime.date', mock_date(delta=2))
-#     def test_delta(self):
-#         from datetime import date
-#         compare(date.today(), d(2001, 1, 1))
-#         compare(date.today(), d(2001, 1, 3))
-#         compare(date.today(), d(2001, 1, 5))
-#
-#     @replace('datetime.date', mock_date(delta_type='weeks'))
-#     def test_delta_type(self):
-#         from datetime import date
-#         compare(date.today(), d(2001, 1, 1))
-#         compare(date.today(), d(2001, 1, 8))
-#         compare(date.today(), d(2001, 1, 22))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_set(self):
-#         from datetime import date
-#         date = cast(type[MockDate], date)
-#         date.set(2001, 1, 2)
-#         compare(date.today(), d(2001, 1, 2))
-#         date.set(2002, 1, 1)
-#         compare(date.today(), d(2002, 1, 1))
-#         compare(date.today(), d(2002, 1, 3))
+    @replace('datetime.date', mock_date())
+    def test_repr(self) -> None:
+        from datetime import date
+        compare(repr(date), "<class 'testfixtures.datetime.MockDate'>")
+    @replace('datetime.date', mock_date(delta=2))
+    def test_delta(self) -> None:
+        from datetime import date
+        compare(date.today(), d(2001, 1, 1))
+        compare(date.today(), d(2001, 1, 3))
+        compare(date.today(), d(2001, 1, 5))
+    @replace('datetime.date', mock_date(delta_type='weeks'))
+    def test_delta_type(self) -> None:
+        from datetime import date
+        compare(date.today(), d(2001, 1, 1))
+        compare(date.today(), d(2001, 1, 8))
+        compare(date.today(), d(2001, 1, 22))
+    @replace('datetime.date', mock_date(None))
+    def test_set(self) -> None:
+        from datetime import date
+        date = cast(type[MockDate], date)
+        date.set(2001, 1, 2)
+        compare(date.today(), d(2001, 1, 2))
+        date.set(2002, 1, 1)
+        compare(date.today(), d(2002, 1, 1))
+        compare(date.today(), d(2002, 1, 3))
 #
 #     @replace('datetime.date', mock_date(None))
 #     def test_set_date_supplied(self):
