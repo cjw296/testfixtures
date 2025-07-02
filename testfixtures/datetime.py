@@ -41,7 +41,7 @@ class MockedCurrent:
     _mock_base_class: type
     _mock_class: type
     _mock_tzinfo: TZInfo | None
-    _mock_date_type: type[date] | None
+    _mock_date_type: type[date]
     _correct_mock_type: Callable[[datetime | date], Self] | None = None
 
     def __init_subclass__(
@@ -58,7 +58,7 @@ class MockedCurrent:
             cls._mock_base_class = cls.__bases__[0].__bases__[1]
             cls._mock_class = cls if strict else cls._mock_base_class
             cls._mock_tzinfo = tzinfo
-            cls._mock_date_type = date_type
+            cls._mock_date_type = date_type if date_type is not None else date
 
     @classmethod
     def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
@@ -335,6 +335,17 @@ class MockDateTime(MockedCurrent, datetime):
                 instance = instance + offset
             instance = instance.replace(tzinfo=tz)
         return instance  # type: ignore[return-value]
+
+    def date(self) -> date:
+        """
+        This will return the date component of the current mock instance,
+        but using the date type supplied when the mock class was created.
+        """
+        return self._mock_date_type(
+            self.year,
+            self.month,
+            self.day
+            )
 #
 #     @classmethod
 #     def utcnow(cls) -> datetime:  # type: ignore[override]

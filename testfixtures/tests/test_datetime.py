@@ -176,14 +176,14 @@ class TestDateTime(TestCase):
         self.assertFalse(dt.__class__ is d)
         compare(dt, d(2001, 1, 1, 1, 0, 0))
 #
-#     def test_date_return_type(self):
-#         with Replacer() as r:
-#             r.replace('datetime.datetime', mock_datetime())
-#             from datetime import datetime
-#             dt = datetime(2001, 1, 1, 1, 0, 0)
-#             d = dt.date()
-#             compare(d, date(2001, 1, 1))
-#             self.assertTrue(d.__class__ is date)
+    def test_date_return_type(self) -> None:
+        with Replacer() as r:
+            r.replace('datetime.datetime', mock_datetime())
+            from datetime import datetime
+            dt = datetime(2001, 1, 1, 1, 0, 0)
+            d = dt.date()
+            compare(d, date(2001, 1, 1))
+            self.assertTrue(d.__class__ is date)
 #
 #     def test_date_return_type_picky(self):
 #         # type checking is a bitch :-/
