@@ -116,12 +116,12 @@ class TestTime(TestCase):
         with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
             time_mock.set(year=2001, tzinfo=SampleTZInfo())
 #
-#     @replace('time.time', mock_time(None))
-#     def test_set_args_tzinfo(self):
-#         from time import time
-#         time = cast(type[MockTime], time)
-#         with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
-#             time.set(2002, 1, 2, 3, 4, 5, 6, SampleTZInfo())
+    @replace('time.time', mock_time(None))
+    def test_set_args_tzinfo(self) -> None:
+        from time import time
+        time_mock = cast(type[MockTime], time)
+        with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
+            time_mock.set(2002, 1, 2, 3, 4, 5, 6, SampleTZInfo())  # type: ignore[arg-type]
 #
 #     @replace('time.time', mock_time(None))
 #     def test_add_kw(self):
