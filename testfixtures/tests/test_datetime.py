@@ -396,38 +396,38 @@ class TestDateTime(TestCase):
         mock_dt.add(2001, 1, 1)
         assert type(mock_dt.now()) is datetime
 #
-#     @replace('datetime.datetime', mock_datetime())
-#     def test_isinstance_default(self):
-#         from datetime import datetime
-#         datetime = cast(type[MockDateTime], datetime)
-#         to_check = []
-#         to_check.append(datetime(1999, 1, 1))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#         to_check.append(datetime.utcnow())
-#         datetime.set(2001, 1, 1, 20)
-#         to_check.append(datetime.now())
-#         datetime.add(2001, 1, 1, 21)
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#         datetime.set(datetime(2001, 1, 1, 22))
-#         to_check.append(datetime.now())
-#         datetime.add(datetime(2001, 1, 1, 23))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#         datetime.set(d(2001, 1, 1, 22))
-#         to_check.append(datetime.now())
-#         datetime.add(d(2001, 1, 1, 23))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#
-#         for inst in to_check:
-#             self.assertFalse(isinstance(inst, datetime), inst)
-#             self.assertFalse(inst.__class__ is datetime, inst)
-#             self.assertTrue(isinstance(inst, d), inst)
-#             self.assertTrue(inst.__class__ is d, inst)
+    @replace('datetime.datetime', mock_datetime())
+    def test_isinstance_default(self) -> None:
+        from datetime import datetime
+        dt_mock = cast(type[MockDateTime], datetime)
+        to_check = []
+        to_check.append(dt_mock(1999, 1, 1))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+        to_check.append(dt_mock.utcnow())
+        dt_mock.set(2001, 1, 1, 20)
+        to_check.append(dt_mock.now())
+        dt_mock.add(2001, 1, 1, 21)
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+        dt_mock.set(dt_mock(2001, 1, 1, 22))
+        to_check.append(dt_mock.now())
+        dt_mock.add(dt_mock(2001, 1, 1, 23))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+        dt_mock.set(d(2001, 1, 1, 22))
+        to_check.append(dt_mock.now())
+        dt_mock.add(d(2001, 1, 1, 23))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+
+        for inst in to_check:
+            self.assertFalse(isinstance(inst, dt_mock), inst)
+            self.assertFalse(inst.__class__ is dt_mock, inst)
+            self.assertTrue(isinstance(inst, d), inst)
+            self.assertTrue(inst.__class__ is d, inst)
 #
 #     def test_subsecond_deltas(self):
 #         datetime = mock_datetime(delta=0.5)
