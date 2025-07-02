@@ -299,10 +299,10 @@ class TestDateTime(TestCase):
         with ShouldRaise(TypeError('Cannot add using tzinfo on MockDateTime')):
             t.add(year=2002, month=1, day=1, tzinfo=SampleTZInfo())
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_add_tzinfo_args(self, t: type[MockDateTime]):
-#         with ShouldRaise(TypeError('Cannot add using tzinfo on MockDateTime')):
-#             t.add(2002, 1, 2, 3, 4, 5, 6, SampleTZInfo())
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_add_tzinfo_args(self, t: type[MockDateTime]) -> None:
+        with ShouldRaise(TypeError('Cannot add using tzinfo on MockDateTime')):
+            t.add(2002, 1, 2, 3, 4, 5, 6, SampleTZInfo())  # type: ignore[arg-type]
 #
 #     @replace('datetime.datetime',
 #              mock_datetime(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo()))
