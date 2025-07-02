@@ -102,12 +102,12 @@ class TestTime(TestCase):
             ))):
             t.set(datetime(2001, 1, 1, tzinfo=tzinfo))
 #
-#     @replace('time.time', mock_time(None))
-#     def test_set_kw(self):
-#         from time import time
-#         time = cast(type[MockTime], time)
-#         time.set(year=2001, month=1, day=1, hour=1, second=1)
-#         compare(time(), 978310801.0)
+    @replace('time.time', mock_time(None))
+    def test_set_kw(self) -> None:
+        from time import time
+        time_mock = cast(type[MockTime], time)
+        time_mock.set(year=2001, month=1, day=1, hour=1, second=1)
+        compare(time(), 978310801.0)
 #
 #     @replace('time.time', mock_time(None))
 #     def test_set_kw_tzinfo(self):
