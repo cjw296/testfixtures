@@ -62,6 +62,10 @@ class MockedCurrent:
 
     @classmethod
     def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
+        # Check for tzinfo in kwargs or args - not allowed
+        if 'tzinfo' in kw or len(args) > 7:
+            raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
+        
         # Simple implementation: create datetime and add to queue
         if args and isinstance(args[0], (datetime, date)):
             instance = args[0]
