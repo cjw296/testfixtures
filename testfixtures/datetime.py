@@ -63,86 +63,25 @@ class MockedCurrent:
         # Default implementation - should be overridden in subclasses
         return instance  # type: ignore[return-value]
 
-    #     @classmethod
-    #     def add(cls, *args, **kw):
-    #         if 'tzinfo' in kw or len(args) > 7:
-    #             raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
-    #         if args and isinstance(args[0], cls._mock_base_class):
-    #             instance = args[0]
-    #             instance_tzinfo = getattr(instance, 'tzinfo', None)
-    #             if instance_tzinfo:
-    #                 if instance_tzinfo != cls._mock_tzinfo:
-    #                     raise ValueError(
-    #                         'Cannot add %s with tzinfo of %s as configured to use %s' % (
-    #                             instance.__class__.__name__, instance_tzinfo, cls._mock_tzinfo
-    #                         ))
-    #                 instance = instance.replace(tzinfo=None)
-    #             if cls._correct_mock_type:
-    #                 instance = cls._correct_mock_type(instance)
-    #         else:
-    #             instance = cls(*args, **kw)
-    #         cls._mock_queue.append(instance)
-
     @classmethod
     def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
-        # Check for tzinfo in kwargs or args - not allowed
         if 'tzinfo' in kw or len(args) > 7:
             raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
-        
-        # Simple implementation: create datetime and add to queue
-        if args and isinstance(args[0], (datetime, date)):
+        if args and isinstance(args[0], cls._mock_base_class):
             instance = args[0]
-            # Check timezone compatibility
             instance_tzinfo = getattr(instance, 'tzinfo', None)
             if instance_tzinfo:
                 if instance_tzinfo != cls._mock_tzinfo:
                     raise ValueError(
-                        'Cannot add datetime with tzinfo of %s as configured to use %s' % (
-                            instance_tzinfo, cls._mock_tzinfo
+                        'Cannot add %s with tzinfo of %s as configured to use %s' % (
+                            instance.__class__.__name__, instance_tzinfo, cls._mock_tzinfo
                         ))
-            # Strip timezone info from instance since mock handles timezone separately
-            if isinstance(instance, datetime) and instance.tzinfo is not None:
-                instance = instance.replace(tzinfo=None)
+                instance = instance.replace(tzinfo=None)  # type: ignore[union-attr,call-arg]
             if cls._correct_mock_type:
-                instance = cls._correct_mock_type(instance)
+                instance = cls._correct_mock_type(instance)  # type: ignore[arg-type]
         else:
-            # Create appropriate type from args and kwargs
-            # Extract integer args
-            int_args = [arg for arg in args if isinstance(arg, int)]
-            
-            # Get values from kwargs or use defaults, ensuring type safety
-            year_val = kw.get('year')
-            year = year_val if isinstance(year_val, int) else (int_args[0] if len(int_args) > 0 else 2001)
-            
-            month_val = kw.get('month')
-            month = month_val if isinstance(month_val, int) else (int_args[1] if len(int_args) > 1 else 1)
-            
-            day_val = kw.get('day')
-            day = day_val if isinstance(day_val, int) else (int_args[2] if len(int_args) > 2 else 1)
-            
-            # Check if this is a date-based mock or datetime-based mock
-            if cls._mock_base_class is date:
-                # For MockDate, only create date objects
-                instance = date(year, month, day)
-            else:
-                # For MockDateTime, create datetime objects
-                hour_val = kw.get('hour')
-                hour = hour_val if isinstance(hour_val, int) else (int_args[3] if len(int_args) > 3 else 0)
-                
-                minute_val = kw.get('minute')
-                minute = minute_val if isinstance(minute_val, int) else (int_args[4] if len(int_args) > 4 else 0)
-                
-                second_val = kw.get('second')
-                second = second_val if isinstance(second_val, int) else (int_args[5] if len(int_args) > 5 else 0)
-                
-                microsecond_val = kw.get('microsecond')
-                microsecond = microsecond_val if isinstance(microsecond_val, int) else (int_args[6] if len(int_args) > 6 else 0)
-                
-                instance = datetime(year, month, day, hour, minute, second, microsecond)
-                
-            if cls._correct_mock_type:
-                instance = cls._correct_mock_type(instance)
-        cls._mock_queue.append(instance)
+            instance = cls(*args, **kw)  # type: ignore[assignment,arg-type]
+        cls._mock_queue.append(instance)  # type: ignore[arg-type]
 
     @classmethod
     def set(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
