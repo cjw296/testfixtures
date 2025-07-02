@@ -87,11 +87,11 @@ class TestDateTime(TestCase):
         with ShouldRaise(TypeError('tzinfo with .utcoffset() returning None is not supported')):
             datetime.now(tz=SampleTZInfo())
 #
-#     @replace('datetime.datetime', mock_datetime(tzinfo=SampleTZInfo()))
-#     def test_now_with_tz_setup_and_supplied(self):
-#         from datetime import datetime
-#         info = SampleTZInfo2()
-#         compare(datetime.now(info), d(2001, 1, 1, 0, 1, tzinfo=info))
+    @replace('datetime.datetime', mock_datetime(tzinfo=SampleTZInfo()))
+    def test_now_with_tz_setup_and_supplied(self) -> None:
+        from datetime import datetime
+        info = SampleTZInfo2()
+        compare(datetime.now(info), d(2001, 1, 1, 0, 1, tzinfo=info))
 #
 #     @replace('datetime.datetime', mock_datetime(tzinfo=SampleTZInfo()))
 #     def test_now_with_tz_setup_and_same_supplied(self):
