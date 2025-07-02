@@ -1,19 +1,20 @@
-# from datetime import date, datetime
-# from datetime import timedelta
-# from datetime import tzinfo
-# from typing import cast
-#
-# from testfixtures import (
-#     Replacer,
-#     ShouldRaise,
-#     compare,
-#     # mock_datetime,
-#     # mock_date,
-#     replace,
-# )
+from datetime import date, datetime
+from datetime import datetime as d
+from datetime import timedelta
+from datetime import tzinfo
+from typing import cast
+
+from testfixtures import (
+    Replacer,
+    ShouldRaise,
+    compare,
+    mock_datetime,
+    # mock_date,
+    replace,
+)
 # from testfixtures.datetime import MockDateTime
 # from testfixtures.tests import sample1
-# from unittest import TestCase
+from unittest import TestCase
 #
 #
 # class SampleTZInfo(tzinfo):
@@ -60,14 +61,14 @@
 #     compare(WeirdTZInfo().dst(datetime(1, 2, 3)), expected=None)
 #
 #
-# class TestDateTime(TestCase):
-#
-#     @replace('datetime.datetime', mock_datetime())
-#     def test_now(self):
-#         from datetime import datetime
-#         compare(datetime.now(), d(2001, 1, 1, 0, 0, 0))
-#         compare(datetime.now(), d(2001, 1, 1, 0, 0, 10))
-#         compare(datetime.now(), d(2001, 1, 1, 0, 0, 30))
+class TestDateTime(TestCase):
+
+    @replace('datetime.datetime', mock_datetime())
+    def test_now(self) -> None:
+        from datetime import datetime
+        compare(datetime.now(), d(2001, 1, 1, 0, 0, 0))
+        compare(datetime.now(), d(2001, 1, 1, 0, 0, 10))
+        compare(datetime.now(), d(2001, 1, 1, 0, 0, 30))
 #
 #     @replace('datetime.datetime', mock_datetime())
 #     def test_now_with_tz_supplied(self):
