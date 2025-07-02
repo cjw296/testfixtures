@@ -315,19 +315,19 @@ class TestDateTime(TestCase):
         from datetime import datetime
         compare(datetime.now(), d(2001, 1, 2))
 #
-#     @replace('datetime.datetime', mock_datetime(
-#         year=2001,
-#         month=1,
-#         day=2,
-#         hour=3,
-#         minute=4,
-#         second=5,
-#         microsecond=6,
-#         tzinfo=SampleTZInfo()
-#         ))
-#     def test_all_kw(self):
-#         from datetime import datetime
-#         compare(datetime.now(), d(2001, 1, 2, 3, 4, 5, 6))
+    @replace('datetime.datetime', mock_datetime(
+        year=2001,
+        month=1,
+        day=2,
+        hour=3,
+        minute=4,
+        second=5,
+        microsecond=6,
+        tzinfo=SampleTZInfo()
+        ))
+    def test_all_kw(self) -> None:
+        from datetime import datetime
+        compare(datetime.now(), d(2001, 1, 2, 3, 4, 5, 6))
 #
 #     @replace('datetime.datetime', mock_datetime(2001, 1, 2))
 #     def test_utc_now(self):
