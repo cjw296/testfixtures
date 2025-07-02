@@ -38,7 +38,7 @@ class MockedCurrent:
     _mock_class: type
     _mock_tzinfo: TZInfo | None
     _mock_date_type: type[date]
-    _correct_mock_type: Callable[[datetime | date], Self] | None = None
+    _correct_mock_type: Callable[[datetime], Self] | None = None
 
     def __init_subclass__(
             cls,
@@ -55,13 +55,6 @@ class MockedCurrent:
             cls._mock_class = cls if strict else cls._mock_base_class
             cls._mock_tzinfo = tzinfo
             cls._mock_date_type = date_type
-            if strict:
-                cls._correct_mock_type = cls._make_correct_mock_type
-
-    @classmethod
-    def _make_correct_mock_type(cls, instance: datetime | date) -> Self:
-        # Default implementation - should be overridden in subclasses
-        return instance  # type: ignore[return-value]
 
     @classmethod
     def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
@@ -247,24 +240,17 @@ class MockDateTime(MockedCurrent, datetime):
 #         return super().tick(*args, **kw)
 
     @classmethod
-    def _make_correct_mock_type(cls, instance: datetime | date) -> Self:
-        if isinstance(instance, datetime):
-            return cls._mock_class(
-                instance.year,
-                instance.month,
-                instance.day,
-                instance.hour,
-                instance.minute,
-                instance.second,
-                instance.microsecond,
-                instance.tzinfo,
-            )  # type: ignore[return-value]
-        else:
-            return cls._mock_class(
-                instance.year,
-                instance.month,
-                instance.day,
-            )  # type: ignore[return-value]
+    def _correct_mock_type(cls, instance: datetime) -> Self:
+        return cls._mock_class(
+            instance.year,
+            instance.month,
+            instance.day,
+            instance.hour,
+            instance.minute,
+            instance.second,
+            instance.microsecond,
+            instance.tzinfo,
+        )  # type: ignore[return-value]
 
     @classmethod
     def _adjust_instance_using_tzinfo(cls, instance: datetime) -> datetime:
@@ -468,19 +454,12 @@ def mock_datetime(
 class MockDate(MockedCurrent, date):
 
     @classmethod
-    def _make_correct_mock_type(cls, instance: datetime | date) -> Self:
-        if isinstance(instance, date):
-            return cls._mock_class(
-                instance.year,
-                instance.month,
-                instance.day,
-            )  # type: ignore[return-value]
-        else:
-            return cls._mock_class(
-                instance.year,
-                instance.month,
-                instance.day,
-            )  # type: ignore[return-value]
+    def _correct_mock_type(cls, instance: date) -> Self:
+        return cls._mock_class(
+            instance.year,
+            instance.month,
+            instance.day,
+        )  # type: ignore[return-value]
 
 #     @overload
 #     @classmethod
