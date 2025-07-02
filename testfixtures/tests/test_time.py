@@ -149,35 +149,35 @@ class TestTime(TestCase):
         from time import time
         compare(time(), 978404645.6)
 #
-#     def test_max_number_tzinfo(self):
-#         with ShouldRaise(TypeError(
-#             "You don't want to use tzinfo with test_time"
-#                 )):
-#             mock_time(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo())
+    def test_max_number_tzinfo(self) -> None:
+        with ShouldRaise(TypeError(
+            "You don't want to use tzinfo with test_time"
+                )):
+            mock_time(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo())  # type: ignore[arg-type]
 #
-#     @replace('time.time', mock_time(2001, 1, 2))
-#     def test_min_number_args(self):
-#         from time import time
-#         compare(time(), 978393600.0)
+    @replace('time.time', mock_time(2001, 1, 2))
+    def test_min_number_args(self) -> None:
+        from time import time
+        compare(time(), 978393600.0)
 #
-#     @replace('time.time', mock_time(
-#         year=2001,
-#         month=1,
-#         day=2,
-#         hour=3,
-#         minute=4,
-#         second=5,
-#         microsecond=6,
-#         ))
-#     def test_all_kw(self):
-#         from time import time
-#         compare(time(), 978404645.000006)
+    @replace('time.time', mock_time(
+        year=2001,
+        month=1,
+        day=2,
+        hour=3,
+        minute=4,
+        second=5,
+        microsecond=6,
+        ))
+    def test_all_kw(self) -> None:
+        from time import time
+        compare(time(), 978404645.000006)
 #
-#     def test_kw_tzinfo(self):
-#         with ShouldRaise(TypeError(
-#             "You don't want to use tzinfo with test_time"
-#                 )):
-#             mock_time(year=2001, tzinfo=SampleTZInfo())
+    def test_kw_tzinfo(self) -> None:
+        with ShouldRaise(TypeError(
+            "You don't want to use tzinfo with test_time"
+                )):
+            mock_time(year=2001, tzinfo=SampleTZInfo())  # type: ignore[arg-type]
 #
 #     def test_instance_tzinfo(self):
 #         from datetime import datetime
