@@ -79,6 +79,11 @@ class MockedCurrent:
                               int_args[5] if len(int_args) > 5 else 0,
                               int_args[6] if len(int_args) > 6 else 0)
         cls._mock_queue.append(instance)
+
+    @classmethod
+    def set(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
+        cls._mock_queue.clear()
+        cls.add(*args, **kw)
 #
 #     @classmethod
 #     def add(cls, *args, **kw):
