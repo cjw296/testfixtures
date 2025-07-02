@@ -65,6 +65,9 @@ class MockedCurrent:
         # Simple implementation: create datetime and add to queue
         if args and isinstance(args[0], (datetime, date)):
             instance = args[0]
+            # Strip timezone info from instance since mock handles timezone separately
+            if isinstance(instance, datetime) and instance.tzinfo is not None:
+                instance = instance.replace(tzinfo=None)
         else:
             # Create datetime from int args - ensure we have at least year, month, day
             int_args = [arg for arg in args if isinstance(arg, int)]

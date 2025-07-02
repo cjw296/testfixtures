@@ -99,9 +99,9 @@ class TestDateTime(TestCase):
         info = SampleTZInfo()
         compare(datetime.now(info), d(2001, 1, 1, tzinfo=info))
 #
-#     def test_now_with_tz_instance(self):
-#         dt = mock_datetime(d(2001, 1, 1, tzinfo=SampleTZInfo()))
-#         compare(dt.now(), d(2001, 1, 1))
+    def test_now_with_tz_instance(self) -> None:
+        dt = mock_datetime(d(2001, 1, 1, tzinfo=SampleTZInfo()))
+        compare(dt.now(), d(2001, 1, 1))
 #
 #     def test_now_with_tz_instance_and_supplied(self):
 #         dt = mock_datetime(d(2001, 1, 1, tzinfo=SampleTZInfo()))
