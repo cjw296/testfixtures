@@ -90,7 +90,7 @@ class MockedCurrent:
             if cls._correct_mock_type:
                 instance = cls._correct_mock_type(instance)
         else:
-            # Create datetime from args and kwargs
+            # Create appropriate type from args and kwargs
             # Extract integer args
             int_args = [arg for arg in args if isinstance(arg, int)]
             
@@ -104,19 +104,26 @@ class MockedCurrent:
             day_val = kw.get('day')
             day = day_val if isinstance(day_val, int) else (int_args[2] if len(int_args) > 2 else 1)
             
-            hour_val = kw.get('hour')
-            hour = hour_val if isinstance(hour_val, int) else (int_args[3] if len(int_args) > 3 else 0)
-            
-            minute_val = kw.get('minute')
-            minute = minute_val if isinstance(minute_val, int) else (int_args[4] if len(int_args) > 4 else 0)
-            
-            second_val = kw.get('second')
-            second = second_val if isinstance(second_val, int) else (int_args[5] if len(int_args) > 5 else 0)
-            
-            microsecond_val = kw.get('microsecond')
-            microsecond = microsecond_val if isinstance(microsecond_val, int) else (int_args[6] if len(int_args) > 6 else 0)
-            
-            instance = datetime(year, month, day, hour, minute, second, microsecond)
+            # Check if this is a date-based mock or datetime-based mock
+            if cls._mock_base_class is date:
+                # For MockDate, only create date objects
+                instance = date(year, month, day)
+            else:
+                # For MockDateTime, create datetime objects
+                hour_val = kw.get('hour')
+                hour = hour_val if isinstance(hour_val, int) else (int_args[3] if len(int_args) > 3 else 0)
+                
+                minute_val = kw.get('minute')
+                minute = minute_val if isinstance(minute_val, int) else (int_args[4] if len(int_args) > 4 else 0)
+                
+                second_val = kw.get('second')
+                second = second_val if isinstance(second_val, int) else (int_args[5] if len(int_args) > 5 else 0)
+                
+                microsecond_val = kw.get('microsecond')
+                microsecond = microsecond_val if isinstance(microsecond_val, int) else (int_args[6] if len(int_args) > 6 else 0)
+                
+                instance = datetime(year, month, day, hour, minute, second, microsecond)
+                
             if cls._correct_mock_type:
                 instance = cls._correct_mock_type(instance)
         cls._mock_queue.append(instance)
@@ -196,7 +203,7 @@ def mock_factory(
         type_name: str,
         mock_class: type[MockedCurrent],
         default: Tuple[int, ...],
-        args: tuple[int | datetime | None | TZInfo, ...],
+        args: tuple[int | datetime | date | None | TZInfo, ...],
         kw: dict[str, int | TZInfo | None],
         delta: float | None,
         delta_type: str,
@@ -539,16 +546,31 @@ def mock_datetime(
         ))
 #
 #
-# class MockDate(MockedCurrent, date):
-#
-#     @classmethod
-#     def _correct_mock_type(cls, instance):
-#         return cls._mock_class(
-#             instance.year,
-#             instance.month,
-#             instance.day,
-#         )
-#
+class MockDate(MockedCurrent, date):
+
+    @classmethod
+    def _make_correct_mock_type(cls, instance: datetime | date) -> Self:
+        if isinstance(instance, date):
+            return cls._mock_class(
+                instance.year,
+                instance.month,
+                instance.day,
+            )  # type: ignore[return-value]
+        else:
+            return cls._mock_class(
+                instance.year,
+                instance.month,
+                instance.day,
+            )  # type: ignore[return-value]
+
+    @classmethod
+    def today(cls) -> Self:
+        """
+        This will return the next supplied or calculated date from the
+        internal queue, rather than the actual current date.
+        """
+        return cast(date, cls._mock_queue.next())  # type: ignore[return-value]
+
 #     @overload
 #     @classmethod
 #     def add(
@@ -689,60 +711,26 @@ def mock_datetime(
 #     ...
 #
 #
-# def mock_date(
-#         *args,
-#         delta: float | None = None,
-#         delta_type: str = 'days',
-#         strict: bool = False,
-#         **kw
-# ) -> type[MockDate]:
-#     """
-#     .. currentmodule:: testfixtures.datetime
-#
-#     A function that returns a mock object that can be used in place of
-#     the :class:`datetime.date` class but where the return value of
-#     :meth:`~datetime.date.today` can be controlled.
-#
-#     If a single positional argument of ``None`` is passed, then the
-#     queue of dates to be returned will be empty and you will need to
-#     call :meth:`~MockDate.set` or :meth:`~MockDate.add` before calling
-#     :meth:`~MockDate.today`.
-#
-#     If an instance of :class:`~datetime.date` is passed as a single
-#     positional argument, that will be used as the first date returned by
-#     :meth:`~datetime.date.today`
-#
-#     :param year:
-#       An optional year used to create the first date returned by :meth:`~datetime.date.today`.
-#
-#     :param month:
-#       An optional month used to create the first date returned by :meth:`~datetime.date.today`.
-#
-#     :param day:
-#       An optional day used to create the first date returned by :meth:`~datetime.date.today`.
-#
-#     :param delta:
-#       The size of the delta to use between values returned from :meth:`~datetime.date.today`.
-#       If not specified, it will increase by 1 with each call to :meth:`~datetime.date.today`.
-#
-#     :param delta_type:
-#       The type of the delta to use between values returned from :meth:`~datetime.date.today`.
-#       This can be any keyword parameter accepted by the :class:`~datetime.timedelta` constructor.
-#
-#     :param strict:
-#       If ``True``, calling the mock class and any of its methods will result in an instance of
-#       the mock being returned. If ``False``, the default, an instance of :class:`~datetime.date`
-#       will be returned instead.
-#
-#     The mock returned will behave exactly as the :class:`datetime.date` class
-#     as well as being a subclass of :class:`~testfixtures.datetime.MockDate`.
-#     """
-#     return cast(type[MockDate], mock_factory(
-#         'MockDate', MockDate, (2001, 1, 1), args, kw,
-#         delta=delta,
-#         delta_type=delta_type,
-#         strict=strict,
-#         ))
+def mock_date(
+        *args: int | date | None,
+        delta: float | None = None,
+        delta_type: str = 'days',
+        strict: bool = False,
+        **kw: int
+) -> type[MockDate]:
+    """
+    .. currentmodule:: testfixtures.datetime
+
+    A function that returns a mock object that can be used in place of
+    the :class:`datetime.date` class but where the return value of
+    :meth:`~datetime.date.today` can be controlled.
+    """
+    return cast(type[MockDate], mock_factory(
+        'MockDate', MockDate, (2001, 1, 1), args, cast(dict[str, int | TZInfo | None], kw),
+        delta=delta,
+        delta_type=delta_type,
+        strict=strict,
+        ))
 #
 #
 # ms = 10**6

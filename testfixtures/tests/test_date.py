@@ -2,24 +2,24 @@ from datetime import date as d, timedelta, date
 from time import strptime
 from typing import cast
 
-# from testfixtures import ShouldRaise, mock_date, replace, compare
-# from testfixtures.datetime import MockDate
-# from testfixtures.tests import sample1, sample2
-# from unittest import TestCase
-#
-#
-# class TestDate(TestCase):
-#
-#     # NB: Only the today method is currently stubbed out,
-#     #     if you need other methods, tests and patches
-#     #     greatfully received!
-#
-#     @replace('datetime.date', mock_date())
-#     def test_today(self):
-#         from datetime import date
-#         compare(date.today(), d(2001, 1, 1))
-#         compare(date.today(), d(2001, 1, 2))
-#         compare(date.today(), d(2001, 1, 4))
+from testfixtures import ShouldRaise, mock_date, replace, compare
+from testfixtures.datetime import MockDate
+from testfixtures.tests import sample1, sample2
+from unittest import TestCase
+
+
+class TestDate(TestCase):
+
+    # NB: Only the today method is currently stubbed out,
+    #     if you need other methods, tests and patches
+    #     greatfully received!
+
+    @replace('datetime.date', mock_date())
+    def test_today(self) -> None:
+        from datetime import date
+        compare(date.today(), d(2001, 1, 1))
+        compare(date.today(), d(2001, 1, 2))
+        compare(date.today(), d(2001, 1, 4))
 #
 #     @replace('datetime.date', mock_date(2001, 2, 3))
 #     def test_today_supplied(self):

@@ -16,7 +16,7 @@ from testfixtures.comparison import (
     Comparison, StringComparison, RoundComparison, compare, diff, RangeComparison,
     SequenceComparison, Subset, Permutation, MappingComparison
 )
-from testfixtures.datetime import mock_datetime  # mock_date, mock_time
+from testfixtures.datetime import mock_datetime, mock_date  # mock_time
 from testfixtures.logcapture import LogCapture, log_capture
 from testfixtures.outputcapture import OutputCapture
 from testfixtures.resolve import resolve
@@ -37,8 +37,8 @@ from testfixtures.utils import wrap, generator
 # backwards compatibility for the old names
 test_datetime = mock_datetime
 test_datetime.__test__ = False  # type: ignore[attr-defined]
-# test_date = mock_date
-# test_date.__test__ = False  # type: ignore[attr-defined]
+test_date = mock_date
+test_date.__test__ = False  # type: ignore[attr-defined]
 # test_time = mock_time
 # test_time.__test__ = False  # type: ignore[attr-defined]
 
@@ -64,7 +64,7 @@ __all__ = [
     'diff',
     'generator',
     'log_capture',
-    # 'mock_date',
+    'mock_date',
     'mock_datetime',
     # 'mock_time',
     'not_there',
@@ -76,7 +76,7 @@ __all__ = [
     'should_raise',
     'singleton',
     'tempdir',
-    # 'test_date',
+    'test_date',
     'test_datetime',
     # 'test_time',
     'wrap',
