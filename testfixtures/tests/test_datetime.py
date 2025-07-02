@@ -435,11 +435,11 @@ class TestDateTime(TestCase):
         compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 500000))
         compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 1, 0))
 #
-#     def test_ms_delta(self):
-#         datetime = mock_datetime(delta=100, delta_type='microseconds')
-#         compare(datetime.now(), datetime(2001, 1, 1, 0, 0, 0, 0))
-#         compare(datetime.now(), datetime(2001, 1, 1, 0, 0, 0, 100))
-#         compare(datetime.now(), datetime(2001, 1, 1, 0, 0, 0, 200))
+    def test_ms_delta(self) -> None:
+        mock_dt = mock_datetime(delta=100, delta_type='microseconds')
+        compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 0))
+        compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 100))
+        compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 200))
 #
 #     def test_tick_when_static(self):
 #         datetime = mock_datetime(delta=0)
