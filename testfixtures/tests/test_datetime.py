@@ -379,11 +379,11 @@ class TestDateTime(TestCase):
         dt = mock_dt(2001, 1, 1) + timedelta(days=1)
         assert type(dt) is mock_dt
 #
-#     def test_non_strict_addition(self):
-#         from datetime import datetime
-#         mock_dt = mock_datetime(strict=False)
-#         dt = mock_dt(2001, 1, 1) + timedelta(days=1)
-#         assert type(dt) is datetime
+    def test_non_strict_addition(self) -> None:
+        from datetime import datetime
+        mock_dt = mock_datetime(strict=False)
+        dt = mock_dt(2001, 1, 1) + timedelta(days=1)
+        assert type(dt) is datetime
 #
 #     def test_strict_add(self):
 #         mock_dt = mock_datetime(None, strict=True)
