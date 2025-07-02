@@ -71,12 +71,12 @@ class TestTime(TestCase):
         compare(time(), 978307210.0)
         compare(time(), 978307220.0)
 #
-#     @replace('time.time', mock_time(delta_type='minutes'))
-#     def test_delta_type(self):
-#         from time import time
-#         compare(time(), 978307200.0)
-#         compare(time(), 978307260.0)
-#         compare(time(), 978307380.0)
+    @replace('time.time', mock_time(delta_type='minutes'))
+    def test_delta_type(self) -> None:
+        from time import time
+        compare(time(), 978307200.0)
+        compare(time(), 978307260.0)
+        compare(time(), 978307380.0)
 #
 #     @replace('time.time', mock_time(None))
 #     def test_set(self):
