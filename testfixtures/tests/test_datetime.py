@@ -216,10 +216,10 @@ class TestDateTime(TestCase):
         finally:
             r.restore()
 #
-#     @replace('datetime.datetime', mock_datetime())
-#     def test_repr(self):
-#         from datetime import datetime
-#         compare(repr(datetime), "<class 'testfixtures.datetime.MockDateTime'>")
+    @replace('datetime.datetime', mock_datetime())
+    def test_repr(self) -> None:
+        from datetime import datetime
+        compare(repr(datetime), "<class 'testfixtures.datetime.MockDateTime'>")
 #
 #     @replace('datetime.datetime', mock_datetime(delta=1))
 #     def test_delta(self):
