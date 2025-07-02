@@ -9,7 +9,7 @@ from testfixtures import (
     ShouldRaise,
     compare,
     mock_datetime,
-    # mock_date,
+    mock_date,
     replace,
 )
 from testfixtures.datetime import MockDateTime
@@ -185,18 +185,18 @@ class TestDateTime(TestCase):
             compare(d, date(2001, 1, 1))
             self.assertTrue(d.__class__ is date)
 
-#     def test_date_return_type_picky(self):
-#         # type checking is a bitch :-/
-#         date_type = mock_date(strict=True)
-#         with Replacer() as r:
-#             r.replace('datetime.datetime', mock_datetime(date_type=date_type,
-#                                                          strict=True,
-#                                                          ))
-#             from datetime import datetime
-#             dt = datetime(2010, 8, 26, 14, 33, 13)
-#             d = dt.date()
-#             compare(d, date_type(2010, 8, 26))
-#             self.assertTrue(d.__class__ is date_type)
+    def test_date_return_type_picky(self) -> None:
+        # type checking is a bitch :-/
+        date_type = mock_date(strict=True)
+        with Replacer() as r:
+            r.replace('datetime.datetime', mock_datetime(date_type=date_type,
+                                                         strict=True,
+                                                         ))
+            from datetime import datetime
+            dt = datetime(2010, 8, 26, 14, 33, 13)
+            d = dt.date()
+            compare(d, date_type(2010, 8, 26))
+            self.assertTrue(d.__class__ is date_type)
 
     # if you have an embedded `now` as above, *and* you need to supply
     # a list of required datetimes, then it's often simplest just to
