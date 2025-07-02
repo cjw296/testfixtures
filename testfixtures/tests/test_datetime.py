@@ -228,12 +228,12 @@ class TestDateTime(TestCase):
         compare(datetime.now(), d(2001, 1, 1, 0, 0, 1))
         compare(datetime.now(), d(2001, 1, 1, 0, 0, 2))
 #
-#     @replace('datetime.datetime', mock_datetime(delta_type='minutes'))
-#     def test_delta_type(self):
-#         from datetime import datetime
-#         compare(datetime.now(), d(2001, 1, 1, 0, 0, 0))
-#         compare(datetime.now(), d(2001, 1, 1, 0, 10, 0))
-#         compare(datetime.now(), d(2001, 1, 1, 0, 30, 0))
+    @replace('datetime.datetime', mock_datetime(delta_type='minutes'))
+    def test_delta_type(self) -> None:
+        from datetime import datetime
+        compare(datetime.now(), d(2001, 1, 1, 0, 0, 0))
+        compare(datetime.now(), d(2001, 1, 1, 0, 10, 0))
+        compare(datetime.now(), d(2001, 1, 1, 0, 30, 0))
 #
 #     @replace('datetime.datetime', mock_datetime(None))
 #     def test_set(self):
