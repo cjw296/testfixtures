@@ -460,9 +460,9 @@ class TestDateTime(TestCase):
         mock_dt.tick(timedelta(hours=1))
         compare(mock_dt.now(), expected=d(2001, 1, 1, 1))
 #
-#     def test_old_import(self):
-#         from testfixtures import test_datetime
-#         assert test_datetime is mock_datetime
+    def test_old_import(self) -> None:
+        from testfixtures import test_datetime
+        assert test_datetime is mock_datetime
 #
 #     def test_add_timedelta_not_strict(self):
 #         mock_class = mock_datetime()

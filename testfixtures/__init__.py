@@ -35,8 +35,8 @@ from testfixtures.utils import wrap, generator
 
 
 # backwards compatibility for the old names
-# test_datetime = mock_datetime
-# test_datetime.__test__ = False  # type: ignore[attr-defined]
+test_datetime = mock_datetime
+test_datetime.__test__ = False  # type: ignore[attr-defined]
 # test_date = mock_date
 # test_date.__test__ = False  # type: ignore[attr-defined]
 # test_time = mock_time
@@ -77,7 +77,7 @@ __all__ = [
     'singleton',
     'tempdir',
     # 'test_date',
-    # 'test_datetime',
+    'test_datetime',
     # 'test_time',
     'wrap',
 ]
