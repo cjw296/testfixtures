@@ -13,7 +13,7 @@ from testfixtures import (
     replace,
 )
 from testfixtures.datetime import MockDateTime
-# from testfixtures.tests import sample1
+from testfixtures.tests import sample1
 from unittest import TestCase
 #
 #
@@ -201,20 +201,20 @@ class TestDateTime(TestCase):
 #     # if you have an embedded `now` as above, *and* you need to supply
 #     # a list of required datetimes, then it's often simplest just to
 #     # do a manual try-finally with a replacer:
-#     def test_import_and_obtain_with_lists(self):
-#
-#         t = mock_datetime(None)
-#         t.add(2002, 1, 1, 1, 0, 0)
-#         t.add(2002, 1, 1, 2, 0, 0)
-#
-#         from testfixtures import Replacer
-#         r = Replacer()
-#         r.replace('testfixtures.tests.sample1.now', t.now)
-#         try:
-#             compare(sample1.str_now_2(), '2002-01-01 01:00:00')
-#             compare(sample1.str_now_2(), '2002-01-01 02:00:00')
-#         finally:
-#             r.restore()
+    def test_import_and_obtain_with_lists(self) -> None:
+
+        t = mock_datetime(None)
+        t.add(2002, 1, 1, 1, 0, 0)
+        t.add(2002, 1, 1, 2, 0, 0)
+
+        from testfixtures import Replacer
+        r = Replacer()
+        r.replace('testfixtures.tests.sample1.now', t.now)
+        try:
+            compare(sample1.str_now_2(), '2002-01-01 01:00:00')
+            compare(sample1.str_now_2(), '2002-01-01 02:00:00')
+        finally:
+            r.restore()
 #
 #     @replace('datetime.datetime', mock_datetime())
 #     def test_repr(self):
