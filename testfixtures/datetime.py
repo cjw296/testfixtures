@@ -46,7 +46,7 @@ class MockedCurrent:
             queue: Queue | None = None,
             strict: bool | None = None,
             tzinfo: TZInfo | None = None,
-            date_type: type[date] | None = None
+            date_type: type[date] = date,
     ) -> None:
         if concrete:
             assert not queue is None, 'queue must be passed if concrete=True'
@@ -54,7 +54,7 @@ class MockedCurrent:
             cls._mock_base_class = cls.__bases__[0].__bases__[1]
             cls._mock_class = cls if strict else cls._mock_base_class
             cls._mock_tzinfo = tzinfo
-            cls._mock_date_type = date_type if date_type is not None else date
+            cls._mock_date_type = date_type
             if strict:
                 cls._correct_mock_type = cls._make_correct_mock_type
 
