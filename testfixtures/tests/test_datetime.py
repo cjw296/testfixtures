@@ -17,40 +17,40 @@ from testfixtures import (
 from unittest import TestCase
 #
 #
-# class SampleTZInfo(tzinfo):
-#
-#     def tzname(self, dt: datetime | None) -> str:
-#         return "SAMPLE"
-#
-#     def utcoffset(self, dt):
-#         return timedelta(minutes=3) + self.dst(dt)
-#
-#     def dst(self, dt):
-#         return timedelta(minutes=1)
-#
-#
-# class SampleTZInfo2(tzinfo):
-#
-#     def tzname(self, dt: datetime | None) -> str:
-#         return "SAMPLE2"
-#
-#     def utcoffset(self, dt):
-#         return timedelta(minutes=5)
-#
-#     def dst(self, dt):
-#         return timedelta(minutes=0)
-#
-#
-# class WeirdTZInfo(tzinfo):
-#
-#     def tzname(self, dt: datetime | None) -> str:
-#         return "WEIRD"
-#
-#     def utcoffset(self, dt):
-#         return None
-#
-#     def dst(self, dt):
-#         return None
+class SampleTZInfo(tzinfo):
+
+    def tzname(self, dt: datetime | None) -> str:
+        return "SAMPLE"
+
+    def utcoffset(self, dt: datetime | None) -> timedelta | None:
+        return timedelta(minutes=3) + self.dst(dt)
+
+    def dst(self, dt: datetime | None) -> timedelta:
+        return timedelta(minutes=1)
+
+
+class SampleTZInfo2(tzinfo):
+
+    def tzname(self, dt: datetime | None) -> str:
+        return "SAMPLE2"
+
+    def utcoffset(self, dt: datetime | None) -> timedelta | None:
+        return timedelta(minutes=5)
+
+    def dst(self, dt: datetime | None) -> timedelta:
+        return timedelta(minutes=0)
+
+
+class WeirdTZInfo(tzinfo):
+
+    def tzname(self, dt: datetime | None) -> str:
+        return "WEIRD"
+
+    def utcoffset(self, dt: datetime | None) -> timedelta | None:
+        return None
+
+    def dst(self, dt: datetime | None) -> timedelta | None:
+        return None
 #
 #
 # def test_sample_tzinfos():
@@ -70,11 +70,11 @@ class TestDateTime(TestCase):
         compare(datetime.now(), d(2001, 1, 1, 0, 0, 10))
         compare(datetime.now(), d(2001, 1, 1, 0, 0, 30))
 #
-#     @replace('datetime.datetime', mock_datetime())
-#     def test_now_with_tz_supplied(self):
-#         from datetime import datetime
-#         info = SampleTZInfo()
-#         compare(datetime.now(info), d(2001, 1, 1, 0, 4, tzinfo=SampleTZInfo()))
+    @replace('datetime.datetime', mock_datetime())
+    def test_now_with_tz_supplied(self) -> None:
+        from datetime import datetime
+        info = SampleTZInfo()
+        compare(datetime.now(info), d(2001, 1, 1, 0, 4, tzinfo=SampleTZInfo()))
 #
 #     @replace('datetime.datetime', mock_datetime(tzinfo=SampleTZInfo()))
 #     def test_now_with_tz_setup(self):

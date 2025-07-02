@@ -289,6 +289,12 @@ class MockDateTime(MockedCurrent, datetime):
         If `tz` is supplied, see :ref:`timezones`.
         """
         instance = cast(datetime, cls._mock_queue.next())
+        if tz is not None:
+            # Apply timezone offset to the instance
+            offset = tz.utcoffset(instance)
+            if offset is not None:
+                instance = instance + offset
+            instance = instance.replace(tzinfo=tz)
         return instance  # type: ignore[return-value]
 #
 #     @classmethod
