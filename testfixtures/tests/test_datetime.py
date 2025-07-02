@@ -429,11 +429,11 @@ class TestDateTime(TestCase):
             self.assertTrue(isinstance(inst, d), inst)
             self.assertTrue(inst.__class__ is d, inst)
 #
-#     def test_subsecond_deltas(self):
-#         datetime = mock_datetime(delta=0.5)
-#         compare(datetime.now(), datetime(2001, 1, 1, 0, 0, 0, 0))
-#         compare(datetime.now(), datetime(2001, 1, 1, 0, 0, 0, 500000))
-#         compare(datetime.now(), datetime(2001, 1, 1, 0, 0, 1, 0))
+    def test_subsecond_deltas(self) -> None:
+        mock_dt = mock_datetime(delta=0.5)
+        compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 0))
+        compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 500000))
+        compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 1, 0))
 #
 #     def test_ms_delta(self):
 #         datetime = mock_datetime(delta=100, delta_type='microseconds')
