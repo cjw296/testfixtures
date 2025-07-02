@@ -78,15 +78,15 @@ class TestTime(TestCase):
         compare(time(), 978307260.0)
         compare(time(), 978307380.0)
 #
-#     @replace('time.time', mock_time(None))
-#     def test_set(self):
-#         from time import time
-#         time = cast(type[MockTime], time)
-#         time.set(2001, 1, 1, 1, 0, 1)
-#         compare(time(), 978310801.0)
-#         time.set(2002, 1, 1, 1, 0, 0)
-#         compare(time(), 1009846800.0)
-#         compare(time(), 1009846802.0)
+    @replace('time.time', mock_time(None))
+    def test_set(self) -> None:
+        from time import time
+        time_mock = cast(type[MockTime], time)
+        time_mock.set(2001, 1, 1, 1, 0, 1)
+        compare(time(), 978310801.0)
+        time_mock.set(2002, 1, 1, 1, 0, 0)
+        compare(time(), 1009846800.0)
+        compare(time(), 1009846802.0)
 #
 #     @replace('time.time', mock_time(None))
 #     def test_set_datetime_supplied(self, t: type[MockTime]):
