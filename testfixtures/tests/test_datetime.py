@@ -260,19 +260,19 @@ class TestDateTime(TestCase):
             ))):
             t.set(d(2001, 1, 1, tzinfo=tzinfo))
 #
-#     @replace('datetime.datetime', mock_datetime(None, tzinfo=SampleTZInfo()))
-#     def test_set_tz_setup(self):
-#         from datetime import datetime
-#         datetime = cast(type[MockDateTime], datetime)
-#         datetime.set(year=2002, month=1, day=1)
-#         compare(datetime.now(), d(2002, 1, 1))
+    @replace('datetime.datetime', mock_datetime(None, tzinfo=SampleTZInfo()))
+    def test_set_tz_setup(self) -> None:
+        from datetime import datetime
+        dt_mock = cast(type[MockDateTime], datetime)
+        dt_mock.set(year=2002, month=1, day=1)
+        compare(datetime.now(), d(2002, 1, 1))
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_set_kw(self):
-#         from datetime import datetime
-#         datetime = cast(type[MockDateTime], datetime)
-#         datetime.set(year=2002, month=1, day=1)
-#         compare(datetime.now(), d(2002, 1, 1))
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_set_kw(self) -> None:
+        from datetime import datetime
+        dt_mock = cast(type[MockDateTime], datetime)
+        dt_mock.set(year=2002, month=1, day=1)
+        compare(datetime.now(), d(2002, 1, 1))
 #
 #     @replace('datetime.datetime', mock_datetime(None))
 #     def test_set_tzinfo_kw(self):
