@@ -22,14 +22,14 @@ class Queue(list[T]):
         self.delta_type = delta_type
 
     def advance_next(self, delta: timedelta) -> None:
-        self[-1] = cast(T, self[-1] + delta)
+        self[-1] += delta  # type: ignore[assignment]
 
     def next(self) -> T:
         instance = self.pop(0)
         if not self:
             self.delta += self.delta_delta
-            n = cast(T, instance + timedelta(**{self.delta_type: self.delta}))
-            self.append(n)
+            n = instance + timedelta(**{self.delta_type: self.delta})
+            self.append(n)  # type: ignore[arg-type]
         return instance
 
 
