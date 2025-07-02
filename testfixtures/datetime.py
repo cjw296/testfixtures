@@ -1,6 +1,6 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Self, Tuple, cast, overload, TypeVar
+from typing import Callable, Self, Tuple, cast, overload, TypeVar, Generic
 
 T = TypeVar('T', bound=datetime | date)
 
@@ -33,19 +33,19 @@ class Queue(list[T]):
         return instance
 
 
-class MockedCurrent:
+class MockedCurrent(Generic[T]):
 
-    _mock_queue: Queue[datetime | date]
+    _mock_queue: Queue[T]
     _mock_base_class: type
     _mock_class: type
     _mock_tzinfo: TZInfo | None
     _mock_date_type: type[date]
-    _correct_mock_type: Callable[[datetime], Self] | None = None
+    _correct_mock_type: Callable[[T], Self] | None = None
 
     def __init_subclass__(
             cls,
             concrete: bool = False,
-            queue: Queue[datetime | date] | None = None,
+            queue: Queue[T] | None = None,
             strict: bool | None = None,
             tzinfo: TZInfo | None = None,
             date_type: type[date] = date,
@@ -59,11 +59,11 @@ class MockedCurrent:
             cls._mock_date_type = date_type
 
     @classmethod
-    def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
+    def add(cls, *args: int | T, **kw: int | TZInfo | None) -> None:
         if 'tzinfo' in kw or len(args) > 7:
             raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
         if args and isinstance(args[0], cls._mock_base_class):
-            instance = args[0]
+            instance = cast(T, args[0])
             instance_tzinfo = getattr(instance, 'tzinfo', None)
             if instance_tzinfo:
                 if instance_tzinfo != cls._mock_tzinfo:
@@ -71,15 +71,16 @@ class MockedCurrent:
                         'Cannot add %s with tzinfo of %s as configured to use %s' % (
                             instance.__class__.__name__, instance_tzinfo, cls._mock_tzinfo
                         ))
-                instance = instance.replace(tzinfo=None)  # type: ignore[union-attr,call-arg]
+                instance = cast(T, instance.replace(tzinfo=None))  # type: ignore[union-attr,call-arg]
             if cls._correct_mock_type:
-                instance = cls._correct_mock_type(instance)  # type: ignore[arg-type]
+                instance = cls._correct_mock_type(instance)
         else:
-            instance = cls(*args, **kw)  # type: ignore[assignment,arg-type]
-        cls._mock_queue.append(instance)  # type: ignore[arg-type]
+            # For int args, create instance through the mock base class
+            instance = cast(T, cls._mock_base_class(*args, **kw))
+        cls._mock_queue.append(instance)
 
     @classmethod
-    def set(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
+    def set(cls, *args: int | T, **kw: int | TZInfo | None) -> None:
         cls._mock_queue.clear()
         cls.add(*args, **kw)
 
@@ -106,9 +107,9 @@ class MockedCurrent:
 
 def mock_factory(
         type_name: str,
-        mock_class: type[MockedCurrent],
+        mock_class: type[MockedCurrent[T]],
         default: Tuple[int, ...],
-        args: tuple[int | datetime | date | None | TZInfo, ...],
+        args: tuple[int | T | None | TZInfo, ...],
         kw: dict[str, int | TZInfo | None],
         delta: float | None,
         delta_type: str,
@@ -116,8 +117,8 @@ def mock_factory(
         date_type: type[date] | None = None,
         tzinfo: TZInfo | None = None,
         strict: bool = False
-) -> type[MockedCurrent]:
-    cls = type(
+) -> type[MockedCurrent[T]]:
+    cls = cast(type[MockedCurrent[T]], type(
         type_name,
         (mock_class,),
         {},
@@ -126,18 +127,17 @@ def mock_factory(
         strict=strict,
         tzinfo=tzinfo,
         date_type=date_type,
-    )
+    ))
 
     if args != (None,):
         if not (args or kw):
             args = default
-        cls.add(*args, **kw)  # type: ignore[arg-type,attr-defined]
+        cls.add(*args, **kw)  # type: ignore[arg-type]
 
     return cls
 
 
-class MockDateTime(MockedCurrent, datetime):
-    _mock_queue: Queue[datetime]  # type: ignore[assignment]
+class MockDateTime(MockedCurrent[datetime], datetime):
 #
 #     @overload
 #     @classmethod
@@ -242,9 +242,9 @@ class MockDateTime(MockedCurrent, datetime):
 #         """
 #         return super().tick(*args, **kw)
 
-    @classmethod
+    @classmethod  
     def _correct_mock_type(cls, instance: datetime) -> Self:
-        return cls._mock_class(
+        return cast(Self, cls._mock_class(
             instance.year,
             instance.month,
             instance.day,
@@ -253,7 +253,8 @@ class MockDateTime(MockedCurrent, datetime):
             instance.second,
             instance.microsecond,
             instance.tzinfo,
-        )  # type: ignore[return-value]
+        ))
+
 
     @classmethod
     def _adjust_instance_using_tzinfo(cls, instance: datetime) -> Self:
@@ -448,16 +449,16 @@ def mock_datetime(
         ))
 
 
-class MockDate(MockedCurrent, date):
-    _mock_queue: Queue[date]  # type: ignore[assignment]
+class MockDate(MockedCurrent[date], date):
 
     @classmethod
     def _correct_mock_type(cls, instance: date) -> Self:
-        return cls._mock_class(
+        return cast(Self, cls._mock_class(
             instance.year,
             instance.month,
             instance.day,
-        )  # type: ignore[return-value]
+        ))
+
 
 #     @overload
 #     @classmethod
@@ -658,8 +659,7 @@ def mock_date(
 ms = 10**6
 
 
-class MockTime(MockedCurrent, datetime):
-    _mock_queue: Queue[datetime]  # type: ignore[assignment]
+class MockTime(MockedCurrent[datetime], datetime):
 
 #     @overload
 #     @classmethod
