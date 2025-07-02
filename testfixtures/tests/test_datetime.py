@@ -53,12 +53,12 @@ class WeirdTZInfo(tzinfo):
         return None
 #
 #
-# def test_sample_tzinfos():
-#     compare(SampleTZInfo().tzname(None), expected='SAMPLE')
-#     compare(SampleTZInfo2().tzname(None), expected='SAMPLE2')
-#     compare(WeirdTZInfo().tzname(None), expected='WEIRD')
-#     compare(WeirdTZInfo().utcoffset(datetime(1, 2, 3)), expected=None)
-#     compare(WeirdTZInfo().dst(datetime(1, 2, 3)), expected=None)
+def test_sample_tzinfos() -> None:
+    compare(SampleTZInfo().tzname(None), expected='SAMPLE')
+    compare(SampleTZInfo2().tzname(None), expected='SAMPLE2')
+    compare(WeirdTZInfo().tzname(None), expected='WEIRD')
+    compare(WeirdTZInfo().utcoffset(datetime(1, 2, 3)), expected=None)
+    compare(WeirdTZInfo().dst(datetime(1, 2, 3)), expected=None)
 #
 #
 class TestDateTime(TestCase):
