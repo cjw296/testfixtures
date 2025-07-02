@@ -275,14 +275,8 @@ class MockDateTime(MockedCurrent, datetime):
         """
         instance = cast(datetime, cls._mock_queue.next())
         if tz is not None:
-            # When tz is supplied, we need to adjust using the mock's configured tzinfo first
-            instance = cls._adjust_instance_using_tzinfo(instance)
-            # Then apply the supplied timezone offset
-            offset = tz.utcoffset(instance)
-            if offset is not None:
-                instance = instance + offset
-            instance = instance.replace(tzinfo=tz)
-        return instance  # type: ignore[return-value]
+            instance = tz.fromutc(cls._adjust_instance_using_tzinfo(instance).replace(tzinfo=tz))
+        return cls._correct_mock_type(instance) # type: ignore[return-value]
 
     @classmethod
     def utcnow(cls) -> Self:
