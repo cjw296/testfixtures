@@ -179,44 +179,44 @@ class TestTime(TestCase):
                 )):
             mock_time(year=2001, tzinfo=SampleTZInfo())  # type: ignore[arg-type]
 #
-#     def test_instance_tzinfo(self):
-#         from datetime import datetime
-#         with ShouldRaise(TypeError(
-#             "You don't want to use tzinfo with test_time"
-#                 )):
-#             mock_time(datetime(2001, 1, 1, tzinfo=SampleTZInfo()))
+    def test_instance_tzinfo(self) -> None:
+        from datetime import datetime
+        with ShouldRaise(TypeError(
+            "You don't want to use tzinfo with test_time"
+                )):
+            mock_time(datetime(2001, 1, 1, tzinfo=SampleTZInfo()))
 #
-#     def test_subsecond_deltas(self):
-#         time = mock_time(delta=0.5)
-#         compare(time(), 978307200.0)
-#         compare(time(), 978307200.5)
-#         compare(time(), 978307201.0)
+    def test_subsecond_deltas(self) -> None:
+        time = mock_time(delta=0.5)
+        compare(time(), 978307200.0)
+        compare(time(), 978307200.5)
+        compare(time(), 978307201.0)
 #
-#     def test_ms_deltas(self):
-#         time = mock_time(delta=1000, delta_type='microseconds')
-#         compare(time(), 978307200.0)
-#         compare(time(), 978307200.001)
-#         compare(time(), 978307200.002)
+    def test_ms_deltas(self) -> None:
+        time = mock_time(delta=1000, delta_type='microseconds')
+        compare(time(), 978307200.0)
+        compare(time(), 978307200.001)
+        compare(time(), 978307200.002)
 #
-#     def test_tick_when_static(self):
-#         time = mock_time(delta=0)
-#         compare(time(), expected=978307200.0)
-#         time.tick(seconds=1)
-#         compare(time(), expected=978307201.0)
+    def test_tick_when_static(self) -> None:
+        time = mock_time(delta=0)
+        compare(time(), expected=978307200.0)
+        time.tick(seconds=1)
+        compare(time(), expected=978307201.0)
 #
-#     def test_tick_when_dynamic(self):
-#         # hopefully not that common?
-#         time = mock_time()
-#         compare(time(), expected=978307200.0)
-#         time.tick(seconds=1)
-#         compare(time(), expected=978307202.0)
+    def test_tick_when_dynamic(self) -> None:
+        # hopefully not that common?
+        time = mock_time()
+        compare(time(), expected=978307200.0)
+        time.tick(seconds=1)
+        compare(time(), expected=978307202.0)
 #
-#     def test_tick_with_timedelta_instance(self):
-#         time = mock_time(delta=0)
-#         compare(time(), expected=978307200.0)
-#         time.tick(timedelta(seconds=1))
-#         compare(time(), expected=978307201.0)
+    def test_tick_with_timedelta_instance(self) -> None:
+        time = mock_time(delta=0)
+        compare(time(), expected=978307200.0)
+        time.tick(timedelta(seconds=1))
+        compare(time(), expected=978307201.0)
 #
-#     def test_old_import(self):
-#         from testfixtures import test_time
-#         assert test_time is mock_time
+    def test_old_import(self) -> None:
+        from testfixtures import test_time
+        assert test_time is mock_time
