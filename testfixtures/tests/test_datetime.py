@@ -310,10 +310,10 @@ class TestDateTime(TestCase):
         from datetime import datetime
         compare(datetime.now(), d(2001, 1, 2, 3, 4, 5, 6))
 #
-#     @replace('datetime.datetime', mock_datetime(2001, 1, 2))
-#     def test_min_number_args(self):
-#         from datetime import datetime
-#         compare(datetime.now(), d(2001, 1, 2))
+    @replace('datetime.datetime', mock_datetime(2001, 1, 2))
+    def test_min_number_args(self) -> None:
+        from datetime import datetime
+        compare(datetime.now(), d(2001, 1, 2))
 #
 #     @replace('datetime.datetime', mock_datetime(
 #         year=2001,
