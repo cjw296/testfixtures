@@ -1,9 +1,11 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Self, Tuple, cast, overload
+from typing import Callable, Self, Tuple, cast, overload, TypeVar
+
+T = TypeVar('T', bound=datetime | date)
 
 
-class Queue(list[datetime | date]):
+class Queue(list[T]):
 
     delta: float
     delta_delta: float
@@ -20,20 +22,20 @@ class Queue(list[datetime | date]):
         self.delta_type = delta_type
 
     def advance_next(self, delta: timedelta) -> None:
-        self[-1] += delta
+        self[-1] = cast(T, self[-1] + delta)
 
-    def next(self) -> datetime | date:
+    def next(self) -> T:
         instance = self.pop(0)
         if not self:
             self.delta += self.delta_delta
-            n = instance + timedelta(**{self.delta_type: self.delta})
+            n = cast(T, instance + timedelta(**{self.delta_type: self.delta}))
             self.append(n)
         return instance
 
 
 class MockedCurrent:
 
-    _mock_queue: Queue
+    _mock_queue: Queue[datetime | date]
     _mock_base_class: type
     _mock_class: type
     _mock_tzinfo: TZInfo | None
@@ -43,7 +45,7 @@ class MockedCurrent:
     def __init_subclass__(
             cls,
             concrete: bool = False,
-            queue: Queue | None = None,
+            queue: Queue[datetime | date] | None = None,
             strict: bool | None = None,
             tzinfo: TZInfo | None = None,
             date_type: type[date] = date,
@@ -135,6 +137,7 @@ def mock_factory(
 
 
 class MockDateTime(MockedCurrent, datetime):
+    _mock_queue: Queue[datetime]  # type: ignore[assignment]
 #
 #     @overload
 #     @classmethod
@@ -273,8 +276,7 @@ class MockDateTime(MockedCurrent, datetime):
 
         If `tz` is supplied, see :ref:`timezones`.
         """
-        instance: datetime
-        instance = cls._mock_queue.next() # type: ignore[assignment]
+        instance = cls._mock_queue.next()
         if tz is not None:
             instance = tz.fromutc(cls._adjust_instance_using_tzinfo(instance).replace(tzinfo=tz))
         return cls._correct_mock_type(instance)
@@ -287,7 +289,7 @@ class MockDateTime(MockedCurrent, datetime):
 
         If you care about timezones, see :ref:`timezones`.
         """
-        instance = cast(datetime, cls._mock_queue.next())
+        instance = cls._mock_queue.next()
         return cls._adjust_instance_using_tzinfo(instance)
 
     def date(self) -> date:
@@ -447,6 +449,7 @@ def mock_datetime(
 
 
 class MockDate(MockedCurrent, date):
+    _mock_queue: Queue[date]  # type: ignore[assignment]
 
     @classmethod
     def _correct_mock_type(cls, instance: date) -> Self:
@@ -551,7 +554,7 @@ class MockDate(MockedCurrent, date):
         internal queue, rather than the actual current date.
 
         """
-        return cast(date, cls._mock_queue.next())  # type: ignore[return-value]
+        return cls._correct_mock_type(cls._mock_queue.next())
 
 
 # @overload
@@ -656,6 +659,7 @@ ms = 10**6
 
 
 class MockTime(MockedCurrent, datetime):
+    _mock_queue: Queue[datetime]  # type: ignore[assignment]
 
 #     @overload
 #     @classmethod
@@ -767,7 +771,7 @@ class MockTime(MockedCurrent, datetime):
             # Used when adding stuff to the queue
             return super().__new__(cls, *args, **kw)  # type: ignore[misc]
         else:
-            instance = cast(datetime, cls._mock_queue.next())
+            instance = cls._mock_queue.next()
             time: float = timegm(instance.utctimetuple())
             time += (float(instance.microsecond) / ms)
             return time
