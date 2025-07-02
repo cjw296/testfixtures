@@ -158,15 +158,15 @@ class TestDateTime(TestCase):
         t = mock_datetime(datetime(2002, 1, 1, 1))
         compare(t.now(), d(2002, 1, 1, 1, 0, 0))
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_now_requested_longer_than_supplied(self, t: type[MockDateTime]):
-#         t.add(2002, 1, 1, 1, 0, 0)
-#         t.add(2002, 1, 1, 2, 0, 0)
-#         from datetime import datetime
-#         compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
-#         compare(datetime.now(), d(2002, 1, 1, 2, 0, 0))
-#         compare(datetime.now(), d(2002, 1, 1, 2, 0, 10))
-#         compare(datetime.now(), d(2002, 1, 1, 2, 0, 30))
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_now_requested_longer_than_supplied(self, t: type[MockDateTime]) -> None:
+        t.add(2002, 1, 1, 1, 0, 0)
+        t.add(2002, 1, 1, 2, 0, 0)
+        from datetime import datetime
+        compare(datetime.now(), d(2002, 1, 1, 1, 0, 0))
+        compare(datetime.now(), d(2002, 1, 1, 2, 0, 0))
+        compare(datetime.now(), d(2002, 1, 1, 2, 0, 10))
+        compare(datetime.now(), d(2002, 1, 1, 2, 0, 30))
 #
 #     @replace('datetime.datetime', mock_datetime(strict=True))
 #     def test_call(self, t: type[MockDateTime]):
