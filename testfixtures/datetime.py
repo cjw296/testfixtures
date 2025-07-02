@@ -63,6 +63,26 @@ class MockedCurrent:
         # Default implementation - should be overridden in subclasses
         return instance  # type: ignore[return-value]
 
+    #     @classmethod
+    #     def add(cls, *args, **kw):
+    #         if 'tzinfo' in kw or len(args) > 7:
+    #             raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
+    #         if args and isinstance(args[0], cls._mock_base_class):
+    #             instance = args[0]
+    #             instance_tzinfo = getattr(instance, 'tzinfo', None)
+    #             if instance_tzinfo:
+    #                 if instance_tzinfo != cls._mock_tzinfo:
+    #                     raise ValueError(
+    #                         'Cannot add %s with tzinfo of %s as configured to use %s' % (
+    #                             instance.__class__.__name__, instance_tzinfo, cls._mock_tzinfo
+    #                         ))
+    #                 instance = instance.replace(tzinfo=None)
+    #             if cls._correct_mock_type:
+    #                 instance = cls._correct_mock_type(instance)
+    #         else:
+    #             instance = cls(*args, **kw)
+    #         cls._mock_queue.append(instance)
+
     @classmethod
     def add(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
         # Check for tzinfo in kwargs or args - not allowed
@@ -131,12 +151,6 @@ class MockedCurrent:
 
     @classmethod
     def tick(cls, *args: timedelta, **kw: float) -> None:
-        """
-        This method should be called either with a timedelta as a positional
-        argument, or with keyword parameters that will be used to construct 
-        a timedelta. The timedelta will be used to advance the next datetime
-        to be returned by now() or utcnow().
-        """
         if kw:
             delta = timedelta(**kw)
         else:
@@ -154,53 +168,8 @@ class MockedCurrent:
             return super().__new__(cls, *args, **kw)  # type: ignore[misc]
         else:
             return cls._mock_class(*args, **kw)  # type: ignore[misc]
-#
-#     @classmethod
-#     def add(cls, *args, **kw):
-#         if 'tzinfo' in kw or len(args) > 7:
-#             raise TypeError('Cannot add using tzinfo on %s' % cls.__name__)
-#         if args and isinstance(args[0], cls._mock_base_class):
-#             instance = args[0]
-#             instance_tzinfo = getattr(instance, 'tzinfo', None)
-#             if instance_tzinfo:
-#                 if instance_tzinfo != cls._mock_tzinfo:
-#                     raise ValueError(
-#                         'Cannot add %s with tzinfo of %s as configured to use %s' % (
-#                             instance.__class__.__name__, instance_tzinfo, cls._mock_tzinfo
-#                         ))
-#                 instance = instance.replace(tzinfo=None)
-#             if cls._correct_mock_type:
-#                 instance = cls._correct_mock_type(instance)
-#         else:
-#             instance = cls(*args, **kw)
-#         cls._mock_queue.append(instance)
-#
-#     @classmethod
-#     def set(cls, *args, **kw) -> None:
-#         cls._mock_queue.clear()
-#         cls.add(*args, **kw)
-#
-#     @classmethod
-#     def tick(cls, *args, **kw) -> None:
-#         if kw:
-#             delta = timedelta(**kw)
-#         else:
-#             delta, = args
-#         cls._mock_queue.advance_next(delta)
-#
-#     def __add__(self, other):
-#         instance = super().__add__(other)
-#         if self._correct_mock_type:
-#             instance = self._correct_mock_type(instance)
-#         return instance
-#
-#     def __new__(cls, *args, **kw):
-#         if cls is cls._mock_class:
-#             return super().__new__(cls, *args, **kw)
-#         else:
-#             return cls._mock_class(*args, **kw)
-#
-#
+
+
 def mock_factory(
         type_name: str,
         mock_class: type[MockedCurrent],
@@ -231,29 +200,9 @@ def mock_factory(
         cls.add(*args, **kw)  # type: ignore[arg-type]
 
     return cls
-#
-#
-class MockDateTime(MockedCurrent, datetime):
 
-    @classmethod
-    def _make_correct_mock_type(cls, instance: datetime | date) -> Self:
-        if isinstance(instance, datetime):
-            return cls._mock_class(
-                instance.year,
-                instance.month,
-                instance.day,
-                instance.hour,
-                instance.minute,
-                instance.second,
-                instance.microsecond,
-                instance.tzinfo,
-            )  # type: ignore[return-value]
-        else:
-            return cls._mock_class(
-                instance.year,
-                instance.month,
-                instance.day,
-            )  # type: ignore[return-value]
+
+class MockDateTime(MockedCurrent, datetime):
 #
 #     @overload
 #     @classmethod
@@ -357,28 +306,26 @@ class MockDateTime(MockedCurrent, datetime):
 #         to be returned by :meth:`~MockDateTime.now` or :meth:`~MockDateTime.utcnow`.
 #         """
 #         return super().tick(*args, **kw)
-#
-#     @classmethod
-#     def _correct_mock_type(cls, instance):
-#         return cls._mock_class(
-#             instance.year,
-#             instance.month,
-#             instance.day,
-#             instance.hour,
-#             instance.minute,
-#             instance.second,
-#             instance.microsecond,
-#             instance.tzinfo,
-#         )
-#
-#     @classmethod
-#     def _adjust_instance_using_tzinfo(cls, instance: datetime) -> datetime:
-#         if cls._mock_tzinfo:
-#             offset = cls._mock_tzinfo.utcoffset(instance)
-#             if offset is None:
-#                 raise TypeError('tzinfo with .utcoffset() returning None is not supported')
-#             instance = instance - offset
-#         return instance
+
+    @classmethod
+    def _make_correct_mock_type(cls, instance: datetime | date) -> Self:
+        if isinstance(instance, datetime):
+            return cls._mock_class(
+                instance.year,
+                instance.month,
+                instance.day,
+                instance.hour,
+                instance.minute,
+                instance.second,
+                instance.microsecond,
+                instance.tzinfo,
+            )  # type: ignore[return-value]
+        else:
+            return cls._mock_class(
+                instance.year,
+                instance.month,
+                instance.day,
+            )  # type: ignore[return-value]
 
     @classmethod
     def _adjust_instance_using_tzinfo(cls, instance: datetime) -> datetime:
@@ -433,30 +380,6 @@ class MockDateTime(MockedCurrent, datetime):
             self.month,
             self.day
             )
-#
-#     @classmethod
-#     def utcnow(cls) -> datetime:  # type: ignore[override]
-#         """
-#         This will return the next supplied or calculated datetime from the
-#         internal queue, rather than the actual current UTC datetime.
-#
-#         If you care about timezones, see :ref:`timezones`.
-#         """
-#         instance = cast(datetime, cls._mock_queue.next())
-#         return cls._adjust_instance_using_tzinfo(instance)
-#
-#     _mock_date_type: type[date]
-#
-#     def date(self) -> date:
-#         """
-#         This will return the date component of the current mock instance,
-#         but using the date type supplied when the mock class was created.
-#         """
-#         return self._mock_date_type(
-#             self.year,
-#             self.month,
-#             self.day
-#             )
 #
 #
 # @overload
@@ -527,6 +450,61 @@ def mock_datetime(
     A function that returns a mock object that can be used in place of
     the :class:`datetime.datetime` class but where the return value of
     :meth:`~MockDateTime.now` can be controlled.
+
+    If a single positional argument of ``None`` is passed, then the
+    queue of datetimes to be returned will be empty and you will need to
+    call :meth:`~MockDateTime.set` or :meth:`~MockDateTime.add` before calling
+    :meth:`~MockDateTime.now` or :meth:`~MockDateTime.utcnow`.
+
+    If an instance of :class:`~datetime.datetime` is passed as a single
+    positional argument, that will be used as the first date returned by
+    :meth:`~MockDateTime.now`
+
+    :param year:
+      An optional year used to create the first datetime returned by :meth:`~MockDateTime.now`.
+
+    :param month:
+      An optional month used to create the first datetime returned by :meth:`~MockDateTime.now`.
+
+    :param day:
+      An optional day used to create the first datetime returned by :meth:`~MockDateTime.now`.
+
+    :param hour:
+      An optional hour used to create the first datetime returned by :meth:`~MockDateTime.now`.
+
+    :param minute:
+      An optional minute used to create the first datetime returned by :meth:`~MockDateTime.now`.
+
+    :param second:
+      An optional second used to create the first datetime returned by :meth:`~MockDateTime.now`.
+
+    :param microsecond:
+      An optional microsecond used to create the first datetime returned by
+      :meth:`~MockDateTime.now`.
+
+    :param tzinfo:
+      An optional :class:`datetime.tzinfo`, see :ref:`timezones`.
+
+    :param delta:
+      The size of the delta to use between values returned from mocked class methods.
+      If not specified, it will increase by 1 with each call to :meth:`~MockDateTime.now`.
+
+    :param delta_type:
+      The type of the delta to use between values returned from mocked class methods.
+      This can be any keyword parameter accepted by the :class:`~datetime.timedelta` constructor.
+
+    :param date_type:
+      The type to use for the return value of the mocked class methods.
+      This can help with gotchas that occur when type checking is performed on values returned
+      by the :meth:`~testfixtures.datetime.MockDateTime.date` method.
+
+    :param strict:
+      If ``True``, calling the mock class and any of its methods will result in an instance of
+      the mock being returned. If ``False``, the default, an instance of
+      :class:`~datetime.datetime` will be returned instead.
+
+    The mock returned will behave exactly as the :class:`datetime.datetime` class
+    as well as being a subclass of :class:`~testfixtures.datetime.MockDateTime`.
     """
     if len(args) > 7:
         tzinfo = args[7]  # type: ignore[assignment]
@@ -546,8 +524,8 @@ def mock_datetime(
         date_type=date_type,
         strict=strict,
         ))
-#
-#
+
+
 class MockDate(MockedCurrent, date):
 
     @classmethod
@@ -564,14 +542,6 @@ class MockDate(MockedCurrent, date):
                 instance.month,
                 instance.day,
             )  # type: ignore[return-value]
-
-    @classmethod
-    def today(cls) -> Self:
-        """
-        This will return the next supplied or calculated date from the
-        internal queue, rather than the actual current date.
-        """
-        return cast(date, cls._mock_queue.next())  # type: ignore[return-value]
 
 #     @overload
 #     @classmethod
@@ -660,17 +630,17 @@ class MockDate(MockedCurrent, date):
 #         to be returned by :meth:`~MockDate.today`.
 #         """
 #         return super().tick(*args, **kw)
-#
-#     @classmethod
-#     def today(cls) -> date:  # type: ignore[override]
-#         """
-#         This will return the next supplied or calculated date from the
-#         internal queue, rather than the actual current date.
-#
-#         """
-#         return cast(date, cls._mock_queue.next())
-#
-#
+
+    @classmethod
+    def today(cls) -> Self:
+        """
+        This will return the next supplied or calculated date from the
+        internal queue, rather than the actual current date.
+
+        """
+        return cast(date, cls._mock_queue.next())  # type: ignore[return-value]
+
+
 # @overload
 # def mock_date(
 #         delta: float | None = None,
@@ -726,6 +696,40 @@ def mock_date(
     A function that returns a mock object that can be used in place of
     the :class:`datetime.date` class but where the return value of
     :meth:`~datetime.date.today` can be controlled.
+
+    If a single positional argument of ``None`` is passed, then the
+    queue of dates to be returned will be empty and you will need to
+    call :meth:`~MockDate.set` or :meth:`~MockDate.add` before calling
+    :meth:`~MockDate.today`.
+
+    If an instance of :class:`~datetime.date` is passed as a single
+    positional argument, that will be used as the first date returned by
+    :meth:`~datetime.date.today`
+
+    :param year:
+      An optional year used to create the first date returned by :meth:`~datetime.date.today`.
+
+    :param month:
+      An optional month used to create the first date returned by :meth:`~datetime.date.today`.
+
+    :param day:
+      An optional day used to create the first date returned by :meth:`~datetime.date.today`.
+
+    :param delta:
+      The size of the delta to use between values returned from :meth:`~datetime.date.today`.
+      If not specified, it will increase by 1 with each call to :meth:`~datetime.date.today`.
+
+    :param delta_type:
+      The type of the delta to use between values returned from :meth:`~datetime.date.today`.
+      This can be any keyword parameter accepted by the :class:`~datetime.timedelta` constructor.
+
+    :param strict:
+      If ``True``, calling the mock class and any of its methods will result in an instance of
+      the mock being returned. If ``False``, the default, an instance of :class:`~datetime.date`
+      will be returned instead.
+
+    The mock returned will behave exactly as the :class:`datetime.date` class
+    as well as being a subclass of :class:`~testfixtures.datetime.MockDate`.
     """
     return cast(type[MockDate], mock_factory(
         'MockDate', MockDate, (2001, 1, 1), args, cast(dict[str, int | TZInfo | None], kw),
@@ -739,20 +743,6 @@ ms = 10**6
 
 
 class MockTime(MockedCurrent, datetime):
-
-    def __new__(cls, *args: int, **kw: int) -> Self | float:  # type: ignore[misc]
-        """
-        Return a :class:`float` representing the mocked current time as would normally
-        be returned by :func:`time.time`.
-        """
-        if args or kw:
-            # Used when adding stuff to the queue
-            return super().__new__(cls, *args, **kw)  # type: ignore[misc]
-        else:
-            instance = cast(datetime, cls._mock_queue.next())
-            time: float = timegm(instance.utctimetuple())
-            time += (float(instance.microsecond)/ms)
-            return time
 
 #     @overload
 #     @classmethod
@@ -855,19 +845,20 @@ class MockTime(MockedCurrent, datetime):
 #         """
 #         return super().tick(*args, **kw)
 #
-#     def __new__(cls, *args, **kw) -> float:  # type: ignore[misc]
-#         """
-#         Return a :class:`float` representing the mocked current time as would normally
-#         be returned by :func:`time.time`.
-#         """
-#         if args or kw:
-#             # Used when adding stuff to the queue
-#             return super().__new__(cls, *args, **kw)
-#         else:
-#             instance = cast(datetime, cls._mock_queue.next())
-#             time: float = timegm(instance.utctimetuple())
-#             time += (float(instance.microsecond)/ms)
-#             return time
+    def __new__(cls, *args: int, **kw: int) -> Self | float:  # type: ignore[misc]
+        """
+        Return a :class:`float` representing the mocked current time as would normally
+        be returned by :func:`time.time`.
+        """
+        if args or kw:
+            # Used when adding stuff to the queue
+            return super().__new__(cls, *args, **kw)  # type: ignore[misc]
+        else:
+            instance = cast(datetime, cls._mock_queue.next())
+            time: float = timegm(instance.utctimetuple())
+            time += (float(instance.microsecond) / ms)
+            return time
+
 #
 #
 # @overload
@@ -911,13 +902,52 @@ class MockTime(MockedCurrent, datetime):
 #     ...
 #
 #
-def mock_time(*args: int | datetime | None, delta: float | None = None, delta_type: str = 'seconds', **kw: int) -> type[MockTime]:
+def mock_time(
+        *args: int | datetime | None,
+        delta: float | None = None,
+        delta_type: str = 'seconds',
+        **kw: int,
+) -> type[MockTime]:
     """
     .. currentmodule:: testfixtures.datetime
 
     A function that returns a :class:`mock object <testfixtures.datetime.MockTime>` that can be
     used in place of the :func:`time.time` function but where the return value can be
     controlled.
+
+    If a single positional argument of ``None`` is passed, then the
+    queue of times to be returned will be empty and you will need to
+    call :meth:`~MockTime.set` or :meth:`~MockTime.add` before calling
+    the mock.
+
+    If an instance of :class:`~datetime.datetime` is passed as a single
+    positional argument, that will be used to create the first time returned.
+
+    :param year: An optional year used to create the first time returned.
+
+    :param month: An optional month used to create the first time.
+
+    :param day: An optional day used to create the first time.
+
+    :param hour: An optional hour used to create the first time.
+
+    :param minute: An optional minute used to create the first time.
+
+    :param second: An optional second used to create the first time.
+
+    :param microsecond: An optional microsecond used to create the first time.
+
+    :param delta:
+      The size of the delta to use between values returned.
+      If not specified, it will increase by 1 with each call to the mock.
+
+    :param delta_type:
+      The type of the delta to use between values returned.
+      This can be any keyword parameter accepted by the :class:`~datetime.timedelta` constructor.
+
+    The :meth:`~testfixtures.datetime.MockTime.add`, :meth:`~testfixtures.datetime.MockTime.set`
+    and :meth:`~testfixtures.datetime.MockTime.tick` methods on the mock can be used to
+    control the return values.
     """
     if 'tzinfo' in kw or len(args) > 7 or (args and getattr(args[0], 'tzinfo', None)):
         raise TypeError("You don't want to use tzinfo with test_time")
