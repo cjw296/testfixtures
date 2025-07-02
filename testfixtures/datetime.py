@@ -77,15 +77,33 @@ class MockedCurrent:
             if isinstance(instance, datetime) and instance.tzinfo is not None:
                 instance = instance.replace(tzinfo=None)
         else:
-            # Create datetime from int args - ensure we have at least year, month, day
+            # Create datetime from args and kwargs
+            # Extract integer args
             int_args = [arg for arg in args if isinstance(arg, int)]
-            while len(int_args) < 3:
-                int_args.extend([2001, 1, 1][:3-len(int_args)])
-            instance = datetime(int_args[0], int_args[1], int_args[2],
-                              int_args[3] if len(int_args) > 3 else 0,
-                              int_args[4] if len(int_args) > 4 else 0,
-                              int_args[5] if len(int_args) > 5 else 0,
-                              int_args[6] if len(int_args) > 6 else 0)
+            
+            # Get values from kwargs or use defaults, ensuring type safety
+            year_val = kw.get('year')
+            year = year_val if isinstance(year_val, int) else (int_args[0] if len(int_args) > 0 else 2001)
+            
+            month_val = kw.get('month')
+            month = month_val if isinstance(month_val, int) else (int_args[1] if len(int_args) > 1 else 1)
+            
+            day_val = kw.get('day')
+            day = day_val if isinstance(day_val, int) else (int_args[2] if len(int_args) > 2 else 1)
+            
+            hour_val = kw.get('hour')
+            hour = hour_val if isinstance(hour_val, int) else (int_args[3] if len(int_args) > 3 else 0)
+            
+            minute_val = kw.get('minute')
+            minute = minute_val if isinstance(minute_val, int) else (int_args[4] if len(int_args) > 4 else 0)
+            
+            second_val = kw.get('second')
+            second = second_val if isinstance(second_val, int) else (int_args[5] if len(int_args) > 5 else 0)
+            
+            microsecond_val = kw.get('microsecond')
+            microsecond = microsecond_val if isinstance(microsecond_val, int) else (int_args[6] if len(int_args) > 6 else 0)
+            
+            instance = datetime(year, month, day, hour, minute, second, microsecond)
         cls._mock_queue.append(instance)
 
     @classmethod
