@@ -288,11 +288,11 @@ class TestDateTime(TestCase):
         with ShouldRaise(TypeError('Cannot add using tzinfo on MockDateTime')):
             dt_mock.set(2002, 1, 2, 3, 4, 5, 6, SampleTZInfo())  # type: ignore[arg-type]
 #
-#     @replace('datetime.datetime', mock_datetime(None))
-#     def test_add_kw(self, t: type[MockDateTime]):
-#         from datetime import datetime
-#         t.add(year=2002, day=1, month=1)
-#         compare(datetime.now(), d(2002, 1, 1))
+    @replace('datetime.datetime', mock_datetime(None))
+    def test_add_kw(self, t: type[MockDateTime]) -> None:
+        from datetime import datetime
+        t.add(year=2002, day=1, month=1)
+        compare(datetime.now(), d(2002, 1, 1))
 #
 #     @replace('datetime.datetime', mock_datetime(None))
 #     def test_add_tzinfo_kw(self, t: type[MockDateTime]):
