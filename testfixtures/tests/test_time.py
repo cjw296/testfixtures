@@ -15,68 +15,61 @@ class TestTime(TestCase):
         compare(time(), 978307200.0)
         compare(time(), 978307201.0)
         compare(time(), 978307203.0)
+    @replace('time.time', mock_time(2002, 1, 1, 1, 2, 3))
+    def test_time_supplied(self) -> None:
+        from time import time
+        compare(time(), 1009846923.0)
+    @replace('time.time', mock_time(None))
+    def test_time_sequence(self, t: type[MockTime]) -> None:
+        t.add(2002, 1, 1, 1, 0, 0)
+        t.add(2002, 1, 1, 2, 0, 0)
+        t.add(2002, 1, 1, 3, 0, 0)
+        from time import time
+        compare(time(), 1009846800.0)
+        compare(time(), 1009850400.0)
+        compare(time(), 1009854000.0)
+    @replace('time.time', mock_time(None))
+    def test_add_datetime_supplied(self, t: type[MockTime]) -> None:
+        from datetime import datetime
+        from time import time
+        t.add(datetime(2002, 1, 1, 2))
+        compare(time(), 1009850400.0)
+        tzinfo = SampleTZInfo()
+        tzrepr = repr(tzinfo)
+        with ShouldRaise(ValueError(
+            'Cannot add datetime with tzinfo of %s as configured to use None' %(
+                tzrepr
+            ))):
+            t.add(datetime(2001, 1, 1, tzinfo=tzinfo))
+    def test_instantiate_with_datetime(self) -> None:
+        from datetime import datetime
+        t = mock_time(datetime(2002, 1, 1, 2))
+        compare(t(), 1009850400.0)
+    @replace('time.time', mock_time(None))
+    def test_now_requested_longer_than_supplied(self, t: type[MockTime]) -> None:
+        t.add(2002, 1, 1, 1, 0, 0)
+        t.add(2002, 1, 1, 2, 0, 0)
+        from time import time
+        compare(time(), 1009846800.0)
+        compare(time(), 1009850400.0)
+        compare(time(), 1009850401.0)
+        compare(time(), 1009850403.0)
+    @replace('time.time', mock_time())
+    def test_call(self, t: type[MockTime]) -> None:
+        compare(t(), 978307200.0)
+        from time import time
+        compare(time(), 978307201.0)
+    @replace('time.time', mock_time())
+    def test_repr_time(self) -> None:
+        from time import time
+        compare(repr(time), "<class 'testfixtures.datetime.MockTime'>")
 #
-#     @replace('time.time', mock_time(2002, 1, 1, 1, 2, 3))
-#     def test_time_supplied(self):
-#         from time import time
-#         compare(time(), 1009846923.0)
-#
-#     @replace('time.time', mock_time(None))
-#     def test_time_sequence(self, t: type[MockTime]):
-#         t.add(2002, 1, 1, 1, 0, 0)
-#         t.add(2002, 1, 1, 2, 0, 0)
-#         t.add(2002, 1, 1, 3, 0, 0)
-#         from time import time
-#         compare(time(), 1009846800.0)
-#         compare(time(), 1009850400.0)
-#         compare(time(), 1009854000.0)
-#
-#     @replace('time.time', mock_time(None))
-#     def test_add_datetime_supplied(self, t: type[MockTime]):
-#         from datetime import datetime
-#         from time import time
-#         t.add(datetime(2002, 1, 1, 2))
-#         compare(time(), 1009850400.0)
-#         tzinfo = SampleTZInfo()
-#         tzrepr = repr(tzinfo)
-#         with ShouldRaise(ValueError(
-#             'Cannot add datetime with tzinfo of %s as configured to use None' %(
-#                 tzrepr
-#             ))):
-#             t.add(datetime(2001, 1, 1, tzinfo=tzinfo))
-#
-#     def test_instantiate_with_datetime(self):
-#         from datetime import datetime
-#         t = mock_time(datetime(2002, 1, 1, 2))
-#         compare(t(), 1009850400.0)
-#
-#     @replace('time.time', mock_time(None))
-#     def test_now_requested_longer_than_supplied(self, t: type[MockTime]):
-#         t.add(2002, 1, 1, 1, 0, 0)
-#         t.add(2002, 1, 1, 2, 0, 0)
-#         from time import time
-#         compare(time(), 1009846800.0)
-#         compare(time(), 1009850400.0)
-#         compare(time(), 1009850401.0)
-#         compare(time(), 1009850403.0)
-#
-#     @replace('time.time', mock_time())
-#     def test_call(self, t: type[MockTime]):
-#         compare(t(), 978307200.0)
-#         from time import time
-#         compare(time(), 978307201.0)
-#
-#     @replace('time.time', mock_time())
-#     def test_repr_time(self):
-#         from time import time
-#         compare(repr(time), "<class 'testfixtures.datetime.MockTime'>")
-#
-#     @replace('time.time', mock_time(delta=10))
-#     def test_delta(self):
-#         from time import time
-#         compare(time(), 978307200.0)
-#         compare(time(), 978307210.0)
-#         compare(time(), 978307220.0)
+    @replace('time.time', mock_time(delta=10))
+    def test_delta(self) -> None:
+        from time import time
+        compare(time(), 978307200.0)
+        compare(time(), 978307210.0)
+        compare(time(), 978307220.0)
 #
 #     @replace('time.time', mock_time(delta_type='minutes'))
 #     def test_delta_type(self):
