@@ -95,7 +95,7 @@ class MockedCurrent(Generic[T]):
         instance = super().__add__(other)  # type: ignore[misc]
         if self._correct_mock_type:
             instance = self._correct_mock_type(instance)
-        return instance  # type: ignore[return-value]
+        return instance
 
     def __new__(cls, *args: int, **kw: int | TZInfo | None) -> Self:
         if cls is cls._mock_class:
