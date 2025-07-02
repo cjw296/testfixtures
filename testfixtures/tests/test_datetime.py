@@ -374,10 +374,10 @@ class TestDateTime(TestCase):
             self.assertTrue(isinstance(inst, d), inst)
             self.assertFalse(inst.__class__ is d, inst)
 #
-#     def test_strict_addition(self):
-#         mock_dt = mock_datetime(strict=True)
-#         dt = mock_dt(2001, 1, 1) + timedelta(days=1)
-#         assert type(dt) is mock_dt
+    def test_strict_addition(self) -> None:
+        mock_dt = mock_datetime(strict=True)
+        dt = mock_dt(2001, 1, 1) + timedelta(days=1)
+        assert type(dt) is mock_dt
 #
 #     def test_non_strict_addition(self):
 #         from datetime import datetime
