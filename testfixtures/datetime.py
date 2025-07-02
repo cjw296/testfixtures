@@ -126,6 +126,20 @@ class MockedCurrent:
         cls._mock_queue.clear()
         cls.add(*args, **kw)
 
+    @classmethod
+    def tick(cls, *args: timedelta, **kw: float) -> None:
+        """
+        This method should be called either with a timedelta as a positional
+        argument, or with keyword parameters that will be used to construct 
+        a timedelta. The timedelta will be used to advance the next datetime
+        to be returned by now() or utcnow().
+        """
+        if kw:
+            delta = timedelta(**kw)
+        else:
+            delta, = args
+        cls._mock_queue.advance_next(delta)
+
     def __new__(cls, *args: int, **kw: int | TZInfo | None) -> Self:
         if cls is cls._mock_class:
             return super().__new__(cls, *args, **kw)  # type: ignore[misc]

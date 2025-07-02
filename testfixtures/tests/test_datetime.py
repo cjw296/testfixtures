@@ -441,11 +441,11 @@ class TestDateTime(TestCase):
         compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 100))
         compare(mock_dt.now(), d(2001, 1, 1, 0, 0, 0, 200))
 #
-#     def test_tick_when_static(self):
-#         datetime = mock_datetime(delta=0)
-#         compare(datetime.now(), expected=d(2001, 1, 1))
-#         datetime.tick(hours=1)
-#         compare(datetime.now(), expected=d(2001, 1, 1, 1))
+    def test_tick_when_static(self) -> None:
+        mock_dt = mock_datetime(delta=0)
+        compare(mock_dt.now(), expected=d(2001, 1, 1))
+        mock_dt.tick(hours=1)
+        compare(mock_dt.now(), expected=d(2001, 1, 1, 1))
 #
 #     def test_tick_when_dynamic(self):
 #         # hopefully not that common?
