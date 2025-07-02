@@ -470,8 +470,8 @@ class TestDateTime(TestCase):
         assert isinstance(value, datetime)
         assert type(value) is datetime
 #
-#     def test_add_timedelta_strict(self):
-#         mock_class = mock_datetime(strict=True)
-#         value = mock_class.now() + timedelta(seconds=10)
-#         assert isinstance(value, datetime)
-#         assert type(value) is mock_class
+    def test_add_timedelta_strict(self) -> None:
+        mock_class = mock_datetime(strict=True)
+        value = mock_class.now() + timedelta(seconds=10)
+        assert isinstance(value, datetime)
+        assert type(value) is mock_class
