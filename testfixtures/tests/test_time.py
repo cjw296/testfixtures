@@ -88,19 +88,19 @@ class TestTime(TestCase):
         compare(time(), 1009846800.0)
         compare(time(), 1009846802.0)
 #
-#     @replace('time.time', mock_time(None))
-#     def test_set_datetime_supplied(self, t: type[MockTime]):
-#         from datetime import datetime
-#         from time import time
-#         t.set(datetime(2001, 1, 1, 1, 0, 1))
-#         compare(time(), 978310801.0)
-#         tzinfo = SampleTZInfo()
-#         tzrepr = repr(tzinfo)
-#         with ShouldRaise(ValueError(
-#             'Cannot add datetime with tzinfo of %s as configured to use None' %(
-#                 tzrepr
-#             ))):
-#             t.set(datetime(2001, 1, 1, tzinfo=tzinfo))
+    @replace('time.time', mock_time(None))
+    def test_set_datetime_supplied(self, t: type[MockTime]) -> None:
+        from datetime import datetime
+        from time import time
+        t.set(datetime(2001, 1, 1, 1, 0, 1))
+        compare(time(), 978310801.0)
+        tzinfo = SampleTZInfo()
+        tzrepr = repr(tzinfo)
+        with ShouldRaise(ValueError(
+            'Cannot add datetime with tzinfo of %s as configured to use None' %(
+                tzrepr
+            ))):
+            t.set(datetime(2001, 1, 1, tzinfo=tzinfo))
 #
 #     @replace('time.time', mock_time(None))
 #     def test_set_kw(self):
