@@ -304,11 +304,11 @@ class TestDateTime(TestCase):
         with ShouldRaise(TypeError('Cannot add using tzinfo on MockDateTime')):
             t.add(2002, 1, 2, 3, 4, 5, 6, SampleTZInfo())  # type: ignore[arg-type]
 #
-#     @replace('datetime.datetime',
-#              mock_datetime(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo()))
-#     def test_max_number_args(self):
-#         from datetime import datetime
-#         compare(datetime.now(), d(2001, 1, 2, 3, 4, 5, 6))
+    @replace('datetime.datetime',
+             mock_datetime(2001, 1, 2, 3, 4, 5, 6, SampleTZInfo()))
+    def test_max_number_args(self) -> None:
+        from datetime import datetime
+        compare(datetime.now(), d(2001, 1, 2, 3, 4, 5, 6))
 #
 #     @replace('datetime.datetime', mock_datetime(2001, 1, 2))
 #     def test_min_number_args(self):

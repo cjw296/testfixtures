@@ -171,7 +171,7 @@ def mock_factory(
         type_name: str,
         mock_class: type[MockedCurrent],
         default: Tuple[int, ...],
-        args: tuple[int | datetime | None, ...],
+        args: tuple[int | datetime | None | TZInfo, ...],
         kw: dict[str, int | TZInfo | None],
         delta: float | None,
         delta_type: str,
@@ -448,7 +448,7 @@ class MockDateTime(MockedCurrent, datetime):
 #
 #
 def mock_datetime(
-        *args: int | datetime | None,
+        *args: int | datetime | None | TZInfo,
         tzinfo: TZInfo | None = None,
         delta: float | None = None,
         delta_type: str = 'seconds',
