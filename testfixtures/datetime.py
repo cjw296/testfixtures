@@ -358,6 +358,17 @@ class MockDateTime(MockedCurrent, datetime):
             instance = instance.replace(tzinfo=tz)
         return instance  # type: ignore[return-value]
 
+    @classmethod
+    def utcnow(cls) -> Self:
+        """
+        This will return the next supplied or calculated datetime from the
+        internal queue, rather than the actual current UTC datetime.
+
+        If you care about timezones, see :ref:`timezones`.
+        """
+        instance = cast(datetime, cls._mock_queue.next())
+        return cls._adjust_instance_using_tzinfo(instance)  # type: ignore[return-value]
+
     def date(self) -> date:
         """
         This will return the date component of the current mock instance,
