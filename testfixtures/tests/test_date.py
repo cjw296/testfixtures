@@ -50,9 +50,9 @@ class TestDate(TestCase):
     @replace('datetime.date', mock_date(None))
     def test_add_date_supplied(self) -> None:
         from datetime import date
-        date = cast(type[MockDate], date)
-        date.add(d(2001, 1, 2))
-        date.add(date(2001, 1, 3))
+        date_mock = cast(type[MockDate], date)
+        date_mock.add(d(2001, 1, 2))
+        date_mock.add(date(2001, 1, 3))
         compare(date.today(), d(2001, 1, 2))
         compare(date.today(), d(2001, 1, 3))
     def test_instantiate_with_date(self) -> None:
@@ -160,34 +160,31 @@ class TestDate(TestCase):
     @replace('datetime.date', mock_date(None))
     def test_set(self) -> None:
         from datetime import date
-        date = cast(type[MockDate], date)
-        date.set(2001, 1, 2)
+        date_mock = cast(type[MockDate], date)
+        date_mock.set(2001, 1, 2)
         compare(date.today(), d(2001, 1, 2))
-        date.set(2002, 1, 1)
+        date_mock.set(2002, 1, 1)
         compare(date.today(), d(2002, 1, 1))
         compare(date.today(), d(2002, 1, 3))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_set_date_supplied(self):
-#         from datetime import date
-#         date = cast(type[MockDate], date)
-#         date.set(d(2001, 1, 2))
-#         compare(date.today(), d(2001, 1, 2))
-#         date.set(date(2001, 1, 3))
-#         compare(date.today(), d(2001, 1, 3))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_set_kw(self):
-#         from datetime import date
-#         date = cast(type[MockDate], date)
-#         date.set(year=2001, month=1, day=2)
-#         compare(date.today(), d(2001, 1, 2))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_add_kw(self, t: type[MockDate]):
-#         t.add(year=2002, month=1, day=1)
-#         from datetime import date
-#         compare(date.today(), d(2002, 1, 1))
+    @replace('datetime.date', mock_date(None))
+    def test_set_date_supplied(self) -> None:
+        from datetime import date
+        date_mock = cast(type[MockDate], date)
+        date_mock.set(d(2001, 1, 2))
+        compare(date.today(), d(2001, 1, 2))
+        date_mock.set(date(2001, 1, 3))
+        compare(date.today(), d(2001, 1, 3))
+    @replace('datetime.date', mock_date(None))
+    def test_set_kw(self) -> None:
+        from datetime import date
+        date_mock = cast(type[MockDate], date)
+        date_mock.set(year=2001, month=1, day=2)
+        compare(date.today(), d(2001, 1, 2))
+    @replace('datetime.date', mock_date(None))
+    def test_add_kw(self, t: type[MockDate]) -> None:
+        t.add(year=2002, month=1, day=1)
+        from datetime import date
+        compare(date.today(), d(2002, 1, 1))
 #
 #     @replace('datetime.date', mock_date(strict=True))
 #     def test_isinstance_strict_true(self):
@@ -269,37 +266,32 @@ class TestDate(TestCase):
 #             self.assertTrue(isinstance(inst, d), inst)
 #             self.assertTrue(inst.__class__ is d, inst)
 #
-#     def test_tick_when_static(self):
-#         date = mock_date(delta=0)
-#         compare(date.today(), expected=d(2001, 1, 1))
-#         date.tick(days=1)
-#         compare(date.today(), expected=d(2001, 1, 2))
-#
-#     def test_tick_when_dynamic(self):
-#         # hopefully not that common?
-#         date = mock_date()
-#         compare(date.today(), expected=date(2001, 1, 1))
-#         date.tick(days=1)
-#         compare(date.today(), expected=date(2001, 1, 3))
-#
-#     def test_tick_with_timedelta_instance(self):
-#         date = mock_date(delta=0)
-#         compare(date.today(), expected=d(2001, 1, 1))
-#         date.tick(timedelta(days=1))
-#         compare(date.today(), expected=d(2001, 1, 2))
-#
-#     def test_old_import(self):
-#         from testfixtures import test_date
-#         assert test_date is mock_date
-#
-#     def test_add_timedelta_not_strict(self):
-#         mock_class = mock_date()
-#         value = mock_class.today() + timedelta(days=1)
-#         assert isinstance(value, date)
-#         assert type(value) is date
-#
-#     def test_add_timedelta_strict(self):
-#         mock_class = mock_date(strict=True)
-#         value = mock_class.today() + timedelta(days=1)
-#         assert isinstance(value, date)
-#         assert type(value) is mock_class
+    def test_tick_when_static(self) -> None:
+        date = mock_date(delta=0)
+        compare(date.today(), expected=d(2001, 1, 1))
+        date.tick(days=1)
+        compare(date.today(), expected=d(2001, 1, 2))
+    def test_tick_when_dynamic(self) -> None:
+        # hopefully not that common?
+        date = mock_date()
+        compare(date.today(), expected=d(2001, 1, 1))
+        date.tick(days=1)
+        compare(date.today(), expected=d(2001, 1, 3))
+    def test_tick_with_timedelta_instance(self) -> None:
+        date = mock_date(delta=0)
+        compare(date.today(), expected=d(2001, 1, 1))
+        date.tick(timedelta(days=1))
+        compare(date.today(), expected=d(2001, 1, 2))
+    def test_old_import(self) -> None:
+        from testfixtures import test_date
+        assert test_date is mock_date
+    def test_add_timedelta_not_strict(self) -> None:
+        mock_class = mock_date()
+        value = mock_class.today() + timedelta(days=1)
+        assert isinstance(value, date)
+        assert type(value) is date
+    def test_add_timedelta_strict(self) -> None:
+        mock_class = mock_date(strict=True)
+        value = mock_class.today() + timedelta(days=1)
+        assert isinstance(value, date)
+        assert type(value) is mock_class

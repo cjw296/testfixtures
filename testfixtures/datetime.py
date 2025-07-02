@@ -147,6 +147,12 @@ class MockedCurrent:
             delta, = args
         cls._mock_queue.advance_next(delta)
 
+    def __add__(self, other: timedelta) -> Self:
+        instance = super().__add__(other)  # type: ignore[misc]
+        if self._correct_mock_type:
+            instance = self._correct_mock_type(instance)
+        return instance  # type: ignore[return-value]
+
     def __new__(cls, *args: int, **kw: int | TZInfo | None) -> Self:
         if cls is cls._mock_class:
             return super().__new__(cls, *args, **kw)  # type: ignore[misc]
