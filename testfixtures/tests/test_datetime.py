@@ -340,39 +340,39 @@ class TestDateTime(TestCase):
         from datetime import datetime
         compare(datetime.utcnow(), d(2001, 1, 1, 23, 56))
 #
-#     @replace('datetime.datetime', mock_datetime(strict=True))
-#     def test_isinstance_strict(self):
-#         from datetime import datetime
-#         datetime = cast(type[MockDateTime], datetime)
-#         to_check = []
-#         to_check.append(datetime(1999, 1, 1))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#         to_check.append(datetime.utcnow())
-#         datetime.set(2001, 1, 1, 20)
-#         to_check.append(datetime.now())
-#         datetime.add(2001, 1, 1, 21)
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now())
-#         datetime.set(datetime(2001, 1, 1, 22))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#         datetime.add(datetime(2001, 1, 1, 23))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#         datetime.set(d(2001, 1, 1, 22))
-#         to_check.append(datetime.now())
-#         datetime.add(d(2001, 1, 1, 23))
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now())
-#         to_check.append(datetime.now(SampleTZInfo()))
-#
-#         for inst in to_check:
-#             self.assertTrue(isinstance(inst, datetime), inst)
-#             self.assertTrue(inst.__class__ is datetime, inst)
-#             self.assertTrue(isinstance(inst, d), inst)
-#             self.assertFalse(inst.__class__ is d, inst)
+    @replace('datetime.datetime', mock_datetime(strict=True))
+    def test_isinstance_strict(self) -> None:
+        from datetime import datetime
+        dt_mock = cast(type[MockDateTime], datetime)
+        to_check = []
+        to_check.append(dt_mock(1999, 1, 1))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+        to_check.append(dt_mock.utcnow())
+        dt_mock.set(2001, 1, 1, 20)
+        to_check.append(dt_mock.now())
+        dt_mock.add(2001, 1, 1, 21)
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now())
+        dt_mock.set(dt_mock(2001, 1, 1, 22))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+        dt_mock.add(dt_mock(2001, 1, 1, 23))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+        dt_mock.set(d(2001, 1, 1, 22))
+        to_check.append(dt_mock.now())
+        dt_mock.add(d(2001, 1, 1, 23))
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now())
+        to_check.append(dt_mock.now(SampleTZInfo()))
+
+        for inst in to_check:
+            self.assertTrue(isinstance(inst, dt_mock), inst)
+            self.assertTrue(inst.__class__ is dt_mock, inst)
+            self.assertTrue(isinstance(inst, d), inst)
+            self.assertFalse(inst.__class__ is d, inst)
 #
 #     def test_strict_addition(self):
 #         mock_dt = mock_datetime(strict=True)
