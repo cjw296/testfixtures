@@ -334,11 +334,11 @@ class TestDateTime(TestCase):
         from datetime import datetime
         compare(datetime.utcnow(), d(2001, 1, 2))
 #
-#     @replace('datetime.datetime',
-#              mock_datetime(2001, 1, 2, tzinfo=SampleTZInfo()))
-#     def test_utc_now_with_tz(self):
-#         from datetime import datetime
-#         compare(datetime.utcnow(), d(2001, 1, 1, 23, 56))
+    @replace('datetime.datetime',
+             mock_datetime(2001, 1, 2, tzinfo=SampleTZInfo()))
+    def test_utc_now_with_tz(self) -> None:
+        from datetime import datetime
+        compare(datetime.utcnow(), d(2001, 1, 1, 23, 56))
 #
 #     @replace('datetime.datetime', mock_datetime(strict=True))
 #     def test_isinstance_strict(self):
