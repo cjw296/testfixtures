@@ -115,7 +115,7 @@ def mock_factory(
         tzinfo: TZInfo | None = None,
         strict: bool = False
 ) -> type[MockedCurrent]:
-    cls = cast(type[MockedCurrent], type(
+    cls = type(
         type_name,
         (mock_class,),
         {},
@@ -124,12 +124,12 @@ def mock_factory(
         strict=strict,
         tzinfo=tzinfo,
         date_type=date_type,
-    ))
+    )
 
     if args != (None,):
         if not (args or kw):
             args = default
-        cls.add(*args, **kw)  # type: ignore[arg-type]
+        cls.add(*args, **kw)  # type: ignore[arg-type,attr-defined]
 
     return cls
 
@@ -253,13 +253,13 @@ class MockDateTime(MockedCurrent, datetime):
         )  # type: ignore[return-value]
 
     @classmethod
-    def _adjust_instance_using_tzinfo(cls, instance: datetime) -> datetime:
+    def _adjust_instance_using_tzinfo(cls, instance: datetime) -> Self:
         if cls._mock_tzinfo:
             offset = cls._mock_tzinfo.utcoffset(instance)
             if offset is None:
                 raise TypeError('tzinfo with .utcoffset() returning None is not supported')
             instance = instance - offset
-        return instance
+        return instance  # type: ignore[return-value]
 
     @classmethod
     def now(cls, tz: TZInfo | None = None) -> Self:
@@ -273,10 +273,11 @@ class MockDateTime(MockedCurrent, datetime):
 
         If `tz` is supplied, see :ref:`timezones`.
         """
-        instance = cast(datetime, cls._mock_queue.next())
+        instance: datetime
+        instance = cls._mock_queue.next() # type: ignore[assignment]
         if tz is not None:
             instance = tz.fromutc(cls._adjust_instance_using_tzinfo(instance).replace(tzinfo=tz))
-        return cls._correct_mock_type(instance) # type: ignore[return-value]
+        return cls._correct_mock_type(instance)
 
     @classmethod
     def utcnow(cls) -> Self:
@@ -287,7 +288,7 @@ class MockDateTime(MockedCurrent, datetime):
         If you care about timezones, see :ref:`timezones`.
         """
         instance = cast(datetime, cls._mock_queue.next())
-        return cls._adjust_instance_using_tzinfo(instance)  # type: ignore[return-value]
+        return cls._adjust_instance_using_tzinfo(instance)
 
     def date(self) -> date:
         """
