@@ -20,26 +20,24 @@ class TestDate(TestCase):
         compare(date.today(), d(2001, 1, 1))
         compare(date.today(), d(2001, 1, 2))
         compare(date.today(), d(2001, 1, 4))
-#
-#     @replace('datetime.date', mock_date(2001, 2, 3))
-#     def test_today_supplied(self):
-#         from datetime import date
-#         compare(date.today(), d(2001, 2, 3))
-#
-#     @replace('datetime.date', mock_date(year=2001, month=2, day=3))
-#     def test_today_all_kw(self):
-#         from datetime import date
-#         compare(date.today(), d(2001, 2, 3))
-#
-#     @replace('datetime.date', mock_date(None))
-#     def test_today_sequence(self, t: type[MockDate]):
-#         t.add(2002, 1, 1)
-#         t.add(2002, 1, 2)
-#         t.add(2002, 1, 3)
-#         from datetime import date
-#         compare(date.today(), d(2002, 1, 1))
-#         compare(date.today(), d(2002, 1, 2))
-#         compare(date.today(), d(2002, 1, 3))
+
+    @replace('datetime.date', mock_date(2001, 2, 3))
+    def test_today_supplied(self) -> None:
+        from datetime import date
+        compare(date.today(), d(2001, 2, 3))
+    @replace('datetime.date', mock_date(year=2001, month=2, day=3))
+    def test_today_all_kw(self) -> None:
+        from datetime import date
+        compare(date.today(), d(2001, 2, 3))
+    @replace('datetime.date', mock_date(None))
+    def test_today_sequence(self, t: type[MockDate]) -> None:
+        t.add(2002, 1, 1)
+        t.add(2002, 1, 2)
+        t.add(2002, 1, 3)
+        from datetime import date
+        compare(date.today(), d(2002, 1, 1))
+        compare(date.today(), d(2002, 1, 2))
+        compare(date.today(), d(2002, 1, 3))
 #
 #     @replace('datetime.date', mock_date(None))
 #     def test_today_requested_longer_than_supplied(self, t: type[MockDate]):
