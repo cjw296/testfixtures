@@ -168,13 +168,13 @@ class TestDateTime(TestCase):
         compare(datetime.now(), d(2002, 1, 1, 2, 0, 10))
         compare(datetime.now(), d(2002, 1, 1, 2, 0, 30))
 #
-#     @replace('datetime.datetime', mock_datetime(strict=True))
-#     def test_call(self, t: type[MockDateTime]):
-#         compare(t(2002, 1, 2, 3, 4, 5), d(2002, 1, 2, 3, 4, 5))
-#         from datetime import datetime
-#         dt = datetime(2001, 1, 1, 1, 0, 0)
-#         self.assertFalse(dt.__class__ is d)
-#         compare(dt, d(2001, 1, 1, 1, 0, 0))
+    @replace('datetime.datetime', mock_datetime(strict=True))
+    def test_call(self, t: type[MockDateTime]) -> None:
+        compare(t(2002, 1, 2, 3, 4, 5), d(2002, 1, 2, 3, 4, 5))
+        from datetime import datetime
+        dt = datetime(2001, 1, 1, 1, 0, 0)
+        self.assertFalse(dt.__class__ is d)
+        compare(dt, d(2001, 1, 1, 1, 0, 0))
 #
 #     def test_date_return_type(self):
 #         with Replacer() as r:

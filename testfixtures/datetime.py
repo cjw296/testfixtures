@@ -92,6 +92,12 @@ class MockedCurrent:
     def set(cls, *args: int | datetime | date, **kw: int | TZInfo | None) -> None:
         cls._mock_queue.clear()
         cls.add(*args, **kw)
+
+    def __new__(cls, *args: int, **kw: int | TZInfo | None) -> Self:
+        if cls is cls._mock_class:
+            return super().__new__(cls, *args, **kw)  # type: ignore[misc]
+        else:
+            return cls._mock_class(*args, **kw)  # type: ignore[misc]
 #
 #     @classmethod
 #     def add(cls, *args, **kw):
