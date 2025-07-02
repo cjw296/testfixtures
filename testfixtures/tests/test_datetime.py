@@ -447,12 +447,12 @@ class TestDateTime(TestCase):
         mock_dt.tick(hours=1)
         compare(mock_dt.now(), expected=d(2001, 1, 1, 1))
 #
-#     def test_tick_when_dynamic(self):
-#         # hopefully not that common?
-#         datetime = mock_datetime()
-#         compare(datetime.now(), expected=d(2001, 1, 1))
-#         datetime.tick(hours=1)
-#         compare(datetime.now(), expected=d(2001, 1, 1, 1, 0, 10))
+    def test_tick_when_dynamic(self) -> None:
+        # hopefully not that common?
+        mock_dt = mock_datetime()
+        compare(mock_dt.now(), expected=d(2001, 1, 1))
+        mock_dt.tick(hours=1)
+        compare(mock_dt.now(), expected=d(2001, 1, 1, 1, 0, 10))
 #
 #     def test_tick_with_timedelta_instance(self):
 #         datetime = mock_datetime(delta=0)
