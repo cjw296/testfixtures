@@ -109,12 +109,12 @@ class TestTime(TestCase):
         time_mock.set(year=2001, month=1, day=1, hour=1, second=1)
         compare(time(), 978310801.0)
 #
-#     @replace('time.time', mock_time(None))
-#     def test_set_kw_tzinfo(self):
-#         from time import time
-#         time = cast(type[MockTime], time)
-#         with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
-#             time.set(year=2001, tzinfo=SampleTZInfo())
+    @replace('time.time', mock_time(None))
+    def test_set_kw_tzinfo(self) -> None:
+        from time import time
+        time_mock = cast(type[MockTime], time)
+        with ShouldRaise(TypeError('Cannot add using tzinfo on MockTime')):
+            time_mock.set(year=2001, tzinfo=SampleTZInfo())
 #
 #     @replace('time.time', mock_time(None))
 #     def test_set_args_tzinfo(self):
