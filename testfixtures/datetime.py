@@ -275,7 +275,16 @@ class MockDateTime(MockedCurrent, datetime):
 #                 raise TypeError('tzinfo with .utcoffset() returning None is not supported')
 #             instance = instance - offset
 #         return instance
-#
+
+    @classmethod
+    def _adjust_instance_using_tzinfo(cls, instance: datetime) -> datetime:
+        if cls._mock_tzinfo:
+            offset = cls._mock_tzinfo.utcoffset(instance)
+            if offset is None:
+                raise TypeError('tzinfo with .utcoffset() returning None is not supported')
+            instance = instance - offset
+        return instance
+
     @classmethod
     def now(cls, tz: TZInfo | None = None) -> Self:
         """
@@ -290,7 +299,9 @@ class MockDateTime(MockedCurrent, datetime):
         """
         instance = cast(datetime, cls._mock_queue.next())
         if tz is not None:
-            # Apply timezone offset to the instance
+            # When tz is supplied, we need to adjust using the mock's configured tzinfo first
+            instance = cls._adjust_instance_using_tzinfo(instance)
+            # Then apply the supplied timezone offset
             offset = tz.utcoffset(instance)
             if offset is not None:
                 instance = instance + offset

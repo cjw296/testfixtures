@@ -81,11 +81,11 @@ class TestDateTime(TestCase):
         from datetime import datetime
         compare(datetime.now(), d(2001, 1, 1))
 #
-#     @replace('datetime.datetime', mock_datetime(tzinfo=WeirdTZInfo()))
-#     def test_now_with_werid_tz_setup(self):
-#         from datetime import datetime
-#         with ShouldRaise(TypeError('tzinfo with .utcoffset() returning None is not supported')):
-#             datetime.now(tz=SampleTZInfo())
+    @replace('datetime.datetime', mock_datetime(tzinfo=WeirdTZInfo()))
+    def test_now_with_werid_tz_setup(self) -> None:
+        from datetime import datetime
+        with ShouldRaise(TypeError('tzinfo with .utcoffset() returning None is not supported')):
+            datetime.now(tz=SampleTZInfo())
 #
 #     @replace('datetime.datetime', mock_datetime(tzinfo=SampleTZInfo()))
 #     def test_now_with_tz_setup_and_supplied(self):
