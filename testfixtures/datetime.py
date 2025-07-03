@@ -1,6 +1,7 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Self, Tuple, TypeVar, Generic, TypedDict, Unpack, Literal
+from typing import Callable, Self, Tuple, TypeVar, Generic, TypedDict, Unpack, Literal, Protocol
+
 
 T = TypeVar('T', bound=datetime | date)
 
@@ -44,6 +45,83 @@ class TimeArgs(TypedDict, total=False):
     minute: int
     second: int
     microsecond: int
+
+
+# Protocol-based interface definitions for mock classes
+class MockDateTimeProtocol(Protocol):
+    """Protocol defining the expected interface for MockDateTime classes."""
+    
+    @classmethod
+    def add(cls, *args: int | datetime, **kwargs: int | TZInfo | None) -> None:
+        """Add a datetime to the queue."""
+        ...
+    
+    @classmethod  
+    def set(cls, *args: int | datetime, **kwargs: int | TZInfo | None) -> None:
+        """Set the next datetime, clearing the queue."""
+        ...
+    
+    @classmethod
+    def tick(cls, *args: timedelta, **kwargs: float) -> None:
+        """Advance the next datetime by a delta."""
+        ...
+    
+    @classmethod
+    def now(cls, tz: TZInfo | None = None) -> Self:
+        """Return the next datetime."""
+        ...
+    
+    @classmethod
+    def utcnow(cls) -> Self:
+        """Return the next datetime as UTC."""
+        ...
+
+
+class MockDateProtocol(Protocol):
+    """Protocol defining the expected interface for MockDate classes."""
+    
+    @classmethod
+    def add(cls, *args: int | date, **kwargs: int) -> None:
+        """Add a date to the queue."""
+        ...
+    
+    @classmethod
+    def set(cls, *args: int | date, **kwargs: int) -> None:
+        """Set the next date, clearing the queue."""
+        ...
+    
+    @classmethod
+    def tick(cls, *args: timedelta, **kwargs: float) -> None:
+        """Advance the next date by a delta."""
+        ...
+    
+    @classmethod
+    def today(cls) -> Self:
+        """Return the next date."""
+        ...
+
+
+class MockTimeProtocol(Protocol):
+    """Protocol defining the expected interface for MockTime classes."""
+    
+    @classmethod
+    def add(cls, *args: int | datetime, **kwargs: int) -> None:
+        """Add a time to the queue."""
+        ...
+    
+    @classmethod
+    def set(cls, *args: int | datetime, **kwargs: int) -> None:
+        """Set the next time, clearing the queue."""
+        ...
+    
+    @classmethod
+    def tick(cls, *args: timedelta, **kwargs: float) -> None:
+        """Advance the next time by a delta."""
+        ...
+    
+    def __call__(self) -> float:
+        """Return the next time as a float."""
+        ...
 
 
 class Queue(list[T]):
