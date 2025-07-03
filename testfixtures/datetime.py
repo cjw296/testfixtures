@@ -1,8 +1,49 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Self, Tuple, TypeVar, Generic
+from typing import Callable, Self, Tuple, TypeVar, Generic, TypedDict, Unpack, Literal
 
 T = TypeVar('T', bound=datetime | date)
+
+
+# TypedDict parameter specifications for mock functions
+class DateTimeKwargs(TypedDict, total=False):
+    tzinfo: TZInfo | None
+    delta: float | None
+    delta_type: Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
+    date_type: type[date]
+    strict: bool
+
+class DateTimeArgs(TypedDict, total=False):
+    year: int
+    month: int  
+    day: int
+    hour: int
+    minute: int
+    second: int
+    microsecond: int
+
+class DateKwargs(TypedDict, total=False):
+    delta: float | None
+    delta_type: Literal['days', 'weeks', 'seconds', 'minutes', 'hours', 'microseconds', 'milliseconds']
+    strict: bool
+
+class DateArgs(TypedDict, total=False):
+    year: int
+    month: int
+    day: int
+
+class TimeKwargs(TypedDict, total=False):
+    delta: float | None
+    delta_type: Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
+
+class TimeArgs(TypedDict, total=False):
+    year: int
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
+    microsecond: int
 
 
 class Queue(list[T]):
