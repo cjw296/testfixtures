@@ -417,7 +417,11 @@ class MockDate(MockedCurrent[date], date):
 
 
 def mock_date(
-        *args: int | date | None,
+        year_or_default: int | date | None = ...,  # type: ignore[assignment]
+        month: int | None = None,
+        day: int | None = None,
+        /,
+        *,
         delta: float | None = None,
         delta_type: str = 'days',
         strict: bool = False,
@@ -464,6 +468,26 @@ def mock_date(
     The mock returned will behave exactly as the :class:`datetime.date` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDate`.
     """
+    # Build args tuple based on the parameters to match original behavior
+    args: tuple[int | date | None, ...]
+    
+    if year_or_default is ... and month is None:
+        # No positional arguments provided: mock_date()
+        args = ()
+    elif year_or_default is None and month is None:
+        # None explicitly passed as first argument: mock_date(None)
+        args = (None,)
+    elif isinstance(year_or_default, date):
+        # Single instance case: mock_date(date_instance)
+        args = (year_or_default,)
+    elif month is not None:
+        # Positional date components case: mock_date(2001, 2, 3)
+        args = (year_or_default, month, day)
+    else:
+        # year_or_default is not None but month is None
+        # This shouldn't happen with explicit positional args, but handle gracefully
+        args = (year_or_default,)
+    
     return mock_factory(
         'MockDate', MockDate, (2001, 1, 1), args, kw,  # type: ignore[arg-type]
         delta=delta,
