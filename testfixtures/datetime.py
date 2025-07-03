@@ -237,7 +237,16 @@ class MockDateTime(MockedCurrent[datetime], datetime):
 
 
 def mock_datetime(
-        *args: int | datetime | None | TZInfo,
+        year_or_default: int | datetime | None = ...,  # type: ignore[assignment]
+        month: int | None = None,
+        day: int | None = None,
+        hour: int = 0,
+        minute: int = 0,
+        second: int = 0,
+        microsecond: int = 0,
+        tzinfo_positional: TZInfo | None = None,
+        /,
+        *,
         tzinfo: TZInfo | None = None,
         delta: float | None = None,
         delta_type: str = 'seconds',
@@ -307,18 +316,43 @@ def mock_datetime(
     The mock returned will behave exactly as the :class:`datetime.datetime` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDateTime`.
     """
-    if len(args) > 7:
-        tzinfo = args[7]  # type: ignore[assignment]
-        args = args[:7]
+    # Resolve tzinfo from positional vs keyword parameter
+    resolved_tzinfo = tzinfo_positional if tzinfo_positional is not None else tzinfo
+    
+    # Build args tuple based on the parameters to match original behavior
+    args: tuple[int | datetime | None | TZInfo, ...]
+    
+    if year_or_default is ... and month is None:
+        # No positional arguments provided: mock_datetime()
+        args = ()
+    elif year_or_default is None and month is None:
+        # None explicitly passed as first argument: mock_datetime(None)
+        args = (None,)
+    elif isinstance(year_or_default, (datetime, date)):
+        # Single instance case: mock_datetime(datetime_instance)
+        args = (year_or_default,)
+        # Extract tzinfo from the instance if present and no explicit tzinfo provided
+        if resolved_tzinfo is None:
+            resolved_tzinfo = getattr(year_or_default, 'tzinfo', None)
+    elif month is not None:
+        # Positional datetime components case: mock_datetime(2001, 1, 2, ...)
+        # Build tuple of provided components
+        components = [year_or_default, month, day]
+        if hour != 0 or minute != 0 or second != 0 or microsecond != 0:
+            components.extend([hour, minute, second, microsecond])
+        args = tuple(components)
     else:
-        tzinfo = tzinfo or (getattr(args[0], 'tzinfo', None) if args else None)
+        # year_or_default is not None but month is None
+        # This shouldn't happen with explicit positional args, but handle gracefully
+        args = (year_or_default,)
+    
     return mock_factory(
         'MockDateTime',
         MockDateTime,
         (2001, 1, 1, 0, 0, 0),
         args,
         kw,
-        tzinfo=tzinfo,
+        tzinfo=resolved_tzinfo,
         delta=delta,
         delta_delta=10,
         delta_type=delta_type,
