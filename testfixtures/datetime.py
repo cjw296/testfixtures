@@ -229,6 +229,24 @@ class MockTimeConfig(TypedDict, total=False):
     delta_type: Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
 
 
+# Advanced Union Types with Literal (Approach 2F)
+
+# Precise parameter types using Literal constraints
+DeltaType = Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
+DateDeltaType = Literal['days', 'weeks']
+TimeDeltaType = Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
+
+# Parameter unions for different contexts - demonstrates advanced type constraints  
+DateTimeCallable = Callable[..., type]  # Would return type[MockDateTime] if forward refs were resolved
+DateCallable = Callable[..., type]      # Would return type[MockDate] if forward refs were resolved
+TimeCallable = Callable[..., type]      # Would return type[MockTime] if forward refs were resolved
+
+# Example of strict literal typing for delta_type parameter validation
+def validate_delta_type(delta_type: DeltaType) -> bool:
+    """Runtime validation function that leverages Literal types."""
+    return delta_type in ('seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds')
+
+
 class Queue(list[T]):
 
     delta: float
