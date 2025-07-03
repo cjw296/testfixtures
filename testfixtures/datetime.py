@@ -124,6 +124,27 @@ class MockTimeProtocol(Protocol):
         ...
 
 
+# Generic type variables with constraints for different call patterns
+DefaultT = TypeVar('DefaultT')  # Allow any type for default values
+ConfigT = TypeVar('ConfigT')
+
+class MockFactory(Generic[DefaultT, ConfigT]):
+    """Generic factory for creating mock objects with typed parameters."""
+    
+    def __init__(self, default: DefaultT, config: ConfigT) -> None:
+        self.default: DefaultT = default
+        self.config: ConfigT = config
+    
+    def create(self) -> type:
+        """Create the mock class with the specified configuration."""
+        return type  # Placeholder implementation
+
+# Type aliases demonstrating different factory configurations
+DateTimeFactory = MockFactory[datetime | None, dict]
+DateFactory = MockFactory[date | None, dict]  
+TimeFactory = MockFactory[datetime | None, dict]
+
+
 class Queue(list[T]):
 
     delta: float
