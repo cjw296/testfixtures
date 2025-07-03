@@ -233,7 +233,7 @@ class MockTimeConfig(TypedDict, total=False):
 
 # Precise parameter types using Literal constraints
 DeltaType = Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
-DateDeltaType = Literal['days', 'weeks']
+DateDeltaType = Literal['days', 'weeks', 'seconds', 'minutes', 'hours', 'microseconds', 'milliseconds']
 TimeDeltaType = Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
 
 # Parameter unions for different contexts - demonstrates advanced type constraints  
@@ -477,12 +477,12 @@ class MockDateTime(MockedCurrent[datetime], datetime):
             self.day
             )
 
-
+    
 def mock_datetime(
         *args: int | datetime | None | TZInfo,
         tzinfo: TZInfo | None = None,
         delta: float | None = None,
-        delta_type: str = 'seconds',
+        delta_type: DeltaType = 'seconds',
         date_type: type[date] = date,
         strict: bool = False,
         **kw: int | TZInfo | None,
@@ -627,7 +627,7 @@ class MockDate(MockedCurrent[date], date):
 def mock_date(
         *args: int | date | None,
         delta: float | None = None,
-        delta_type: str = 'days',
+        delta_type: DateDeltaType = 'days',
         strict: bool = False,
         **kw: int
 ) -> type[MockDate]:
@@ -737,7 +737,7 @@ class MockTime(MockedCurrent[datetime], datetime):
 def mock_time(
         *args: int | datetime | None,
         delta: float | None = None,
-        delta_type: str = 'seconds',
+        delta_type: TimeDeltaType = 'seconds',
         **kw: int,
 ) -> type[MockTime]:
     """
