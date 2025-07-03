@@ -1,6 +1,6 @@
 from calendar import timegm
 from datetime import datetime, timedelta, date, tzinfo as TZInfo
-from typing import Callable, Self, Tuple, TypeVar, Generic, TypedDict, Unpack, Literal, Protocol
+from typing import Callable, Self, Tuple, TypeVar, Generic, TypedDict, Unpack, Literal, Protocol, ParamSpec, Concatenate
 
 
 T = TypeVar('T', bound=datetime | date)
@@ -143,6 +143,41 @@ class MockFactory(Generic[DefaultT, ConfigT]):
 DateTimeFactory = MockFactory[datetime | None, dict]
 DateFactory = MockFactory[date | None, dict]  
 TimeFactory = MockFactory[datetime | None, dict]
+
+
+# ParamSpec for advanced callable typing
+P = ParamSpec('P')
+
+class MockCallable(Generic[P]):
+    """Callable with precise parameter specification."""
+    
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> type:
+        """Create mock with specified parameters."""
+        return type
+
+# Define specific parameter specifications for each mock type
+DateTimeParams = ParamSpec('DateTimeParams')
+DateParams = ParamSpec('DateParams')
+TimeParams = ParamSpec('TimeParams')
+
+# Wrapper functions demonstrating ParamSpec parameter forwarding
+def create_datetime_mock_wrapper(func: Callable[DateTimeParams, type]) -> Callable[DateTimeParams, type]:
+    """Wrapper that preserves exact parameter signature for datetime mocks."""
+    def wrapper(*args: DateTimeParams.args, **kwargs: DateTimeParams.kwargs) -> type:
+        return func(*args, **kwargs)
+    return wrapper
+
+def create_date_mock_wrapper(func: Callable[DateParams, type]) -> Callable[DateParams, type]:
+    """Wrapper that preserves exact parameter signature for date mocks."""
+    def wrapper(*args: DateParams.args, **kwargs: DateParams.kwargs) -> type:
+        return func(*args, **kwargs)
+    return wrapper
+
+def create_time_mock_wrapper(func: Callable[TimeParams, type]) -> Callable[TimeParams, type]:
+    """Wrapper that preserves exact parameter signature for time mocks."""
+    def wrapper(*args: TimeParams.args, **kwargs: TimeParams.kwargs) -> type:
+        return func(*args, **kwargs)
+    return wrapper
 
 
 class Queue(list[T]):
