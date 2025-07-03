@@ -5,6 +5,13 @@ from typing import Callable, Self, Tuple, overload, TypeVar, Generic
 T = TypeVar('T', bound=datetime | date)
 
 
+class _NotPassed:
+    pass
+
+
+_NOT_PASSED = _NotPassed()
+
+
 class Queue(list[T]):
 
     delta: float
@@ -358,13 +365,20 @@ class MockDateTime(MockedCurrent[datetime], datetime):
 #
 #
 def mock_datetime(
-        *args: int | datetime | None | TZInfo,
+        year: int | datetime | None | _NotPassed = _NOT_PASSED,
+        month: int | None = None,
+        day: int | None = None,
+        hour: int = 0,
+        minute: int = 0,
+        second: int = 0,
+        microsecond: int = 0,
+        tzinfo_pos: TZInfo | None = None,
+        *,
         tzinfo: TZInfo | None = None,
         delta: float | None = None,
         delta_type: str = 'seconds',
         date_type: type[date] = date,
         strict: bool = False,
-        **kw: int | TZInfo | None,
 ) -> type[MockDateTime]:
     """
     .. currentmodule:: testfixtures.datetime
@@ -428,18 +442,43 @@ def mock_datetime(
     The mock returned will behave exactly as the :class:`datetime.datetime` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDateTime`.
     """
-    if len(args) > 7:
-        tzinfo = args[7]  # type: ignore[assignment]
-        args = args[:7]
+    args: tuple[int | datetime | None | TZInfo, ...]
+    if isinstance(year, _NotPassed):
+        args = ()
+        effective_tzinfo = tzinfo
+    elif isinstance(year, datetime) or (
+        year is None
+        and month is None
+        and day is None
+        and hour == 0
+        and minute == 0
+        and second == 0
+        and microsecond == 0
+        and tzinfo_pos is None
+    ):
+        args = (year,)
+        effective_tzinfo = tzinfo or (
+            year.tzinfo if isinstance(year, datetime) else None
+        )
     else:
-        tzinfo = tzinfo or (getattr(args[0], 'tzinfo', None) if args else None)
+        args_list: list[int | datetime | None | TZInfo] = [
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            microsecond,
+        ]
+        effective_tzinfo = tzinfo_pos or tzinfo
+        args = tuple(args_list)
     return mock_factory(
         'MockDateTime',
         MockDateTime,
         (2001, 1, 1, 0, 0, 0),
         args,
-        kw,
-        tzinfo=tzinfo,
+        {},
+        tzinfo=effective_tzinfo,
         delta=delta,
         delta_delta=10,
         delta_type=delta_type,
@@ -600,11 +639,13 @@ class MockDate(MockedCurrent[date], date):
 #
 #
 def mock_date(
-        *args: int | date | None,
+        year: int | date | None | _NotPassed = _NOT_PASSED,
+        month: int | None = None,
+        day: int | None = None,
+        *,
         delta: float | None = None,
         delta_type: str = 'days',
         strict: bool = False,
-        **kw: int
 ) -> type[MockDate]:
     """
     .. currentmodule:: testfixtures.datetime
@@ -647,8 +688,18 @@ def mock_date(
     The mock returned will behave exactly as the :class:`datetime.date` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDate`.
     """
+    if isinstance(year, _NotPassed):
+        args: tuple[int | date | None, ...] = ()
+    elif isinstance(year, date) or (year is None and month is None and day is None):
+        args = (year,)
+    else:
+        args = (year, month, day)
     return mock_factory(
-        'MockDate', MockDate, (2001, 1, 1), args, kw,  # type: ignore[arg-type]
+        'MockDate',
+        MockDate,
+        (2001, 1, 1),
+        args,
+        {},
         delta=delta,
         delta_type=delta_type,
         strict=strict,
@@ -819,10 +870,18 @@ class MockTime(MockedCurrent[datetime], datetime):
 #
 #
 def mock_time(
-        *args: int | datetime | None,
+        year: int | datetime | None | _NotPassed = _NOT_PASSED,
+        month: int | None = None,
+        day: int | None = None,
+        hour: int = 0,
+        minute: int = 0,
+        second: int = 0,
+        microsecond: int = 0,
+        tzinfo_pos: TZInfo | None = None,
+        *,
         delta: float | None = None,
         delta_type: str = 'seconds',
-        **kw: int,
+        tzinfo: TZInfo | None = None,
 ) -> type[MockTime]:
     """
     .. currentmodule:: testfixtures.datetime
@@ -865,10 +924,24 @@ def mock_time(
     and :meth:`~testfixtures.datetime.MockTime.tick` methods on the mock can be used to
     control the return values.
     """
-    if 'tzinfo' in kw or len(args) > 7 or (args and getattr(args[0], 'tzinfo', None)):
+    if tzinfo is not None or tzinfo_pos is not None:
         raise TypeError("You don't want to use tzinfo with test_time")
+    if isinstance(year, _NotPassed):
+        args: tuple[int | datetime | None, ...] = ()
+    elif isinstance(year, datetime):
+        if year.tzinfo is not None:
+            raise TypeError("You don't want to use tzinfo with test_time")
+        args = (year,)
+    elif year is None and month is None and day is None and hour == 0 and minute == 0 and second == 0 and microsecond == 0:
+        args = (year,)
+    else:
+        args = (year, month, day, hour, minute, second, microsecond)
     return mock_factory(
-        'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), args, kw,  # type: ignore[arg-type]
+        'MockTime',
+        MockTime,
+        (2001, 1, 1, 0, 0, 0),
+        args,
+        {},
         delta=delta,
         delta_type=delta_type,
     )  # type: ignore[return-value]
