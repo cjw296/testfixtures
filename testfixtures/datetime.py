@@ -180,6 +180,55 @@ def create_time_mock_wrapper(func: Callable[TimeParams, type]) -> Callable[TimeP
     return wrapper
 
 
+# Hybrid TypedDict + Overload Strategy (Most Promising Approach)
+
+# Comprehensive parameter specification combining all parameters
+class MockDateTimeConfig(TypedDict, total=False):
+    """Complete configuration for mock_datetime with precise typing."""
+    # Core datetime parameters  
+    year: int
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
+    microsecond: int
+    
+    # Configuration parameters
+    tzinfo: TZInfo | None
+    delta: float | None
+    delta_type: Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
+    date_type: type[date]
+    strict: bool
+
+class MockDateConfig(TypedDict, total=False):
+    """Complete configuration for mock_date with precise typing."""
+    # Core date parameters
+    year: int
+    month: int
+    day: int
+    
+    # Configuration parameters  
+    delta: float | None
+    delta_type: Literal['days', 'weeks', 'seconds', 'minutes', 'hours', 'microseconds', 'milliseconds']
+    strict: bool
+
+class MockTimeConfig(TypedDict, total=False):
+    """Complete configuration for mock_time with precise typing."""
+    # Core time parameters
+    year: int
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
+    microsecond: int
+    
+    # Configuration parameters
+    delta: float | None
+    delta_type: Literal['seconds', 'minutes', 'hours', 'days', 'weeks', 'microseconds', 'milliseconds']
+
+
 class Queue(list[T]):
 
     delta: float
