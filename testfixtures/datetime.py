@@ -237,14 +237,7 @@ class MockDateTime(MockedCurrent[datetime], datetime):
 
 
 def mock_datetime(
-        year_or_default: int | datetime | None = ...,  # type: ignore[assignment]
-        month: int | None = None,
-        day: int | None = None,
-        hour: int = 0,
-        minute: int = 0,
-        second: int = 0,
-        microsecond: int = 0,
-        *args: TZInfo,
+        *args: int | datetime | None | TZInfo,
         tzinfo: TZInfo | None = None,
         delta: float | None = None,
         delta_type: str = 'seconds',
@@ -314,64 +307,43 @@ def mock_datetime(
     The mock returned will behave exactly as the :class:`datetime.datetime` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDateTime`.
     """
-    # Handle tzinfo from args or keyword parameter
+    # Handle tzinfo from args (8th position) or keyword parameter  
     resolved_tzinfo = tzinfo
-    if args:
-        if len(args) == 1:
-            resolved_tzinfo = args[0]
-        else:
-            raise TypeError(f"Too many positional arguments ({len(args)})")
+    final_args = args
     
-    # Build args tuple based on the parameters to match original behavior
-    func_args: tuple[int | datetime | None | TZInfo, ...]
-    
-    # Check if datetime components were passed as keywords
-    if any(k in kw for k in ('year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond')):
-        # Extract from kw and remove them so they don't get passed twice
-        year = kw.pop('year', year_or_default if year_or_default is not ... else None)
-        month_val = kw.pop('month', month)
-        day_val = kw.pop('day', day)
-        hour_val = kw.pop('hour', hour)
-        minute_val = kw.pop('minute', minute)
-        second_val = kw.pop('second', second)
-        microsecond_val = kw.pop('microsecond', microsecond)
-        
-        if year is not None and month_val is not None and day_val is not None:
-            components: list[int | datetime | None | TZInfo] = [year, month_val, day_val]
-            if hour_val != 0 or minute_val != 0 or second_val != 0 or microsecond_val != 0:
-                components.extend([hour_val, minute_val, second_val, microsecond_val])
-            func_args = tuple(components)
-        else:
-            func_args = ()  # Will use defaults
-    elif year_or_default is ... and month is None:
-        # No positional arguments provided: mock_datetime()
-        func_args = ()
-    elif year_or_default is None and month is None:
-        # None explicitly passed as first argument: mock_datetime(None)
-        func_args = (None,)
-    elif isinstance(year_or_default, (datetime, date)):
-        # Single instance case: mock_datetime(datetime_instance)
-        func_args = (year_or_default,)
-        # Extract tzinfo from the instance if present and no explicit tzinfo provided
+    if len(args) > 7:
+        # Extract tzinfo from 8th position
+        resolved_tzinfo = args[7]  # type: ignore[assignment]
+        final_args = args[:7]
+    elif len(args) == 1 and isinstance(args[0], (datetime, date)):
+        # Single instance case - extract tzinfo if present
         if resolved_tzinfo is None:
-            resolved_tzinfo = getattr(year_or_default, 'tzinfo', None)
-    elif month is not None:
-        # Positional datetime components case: mock_datetime(2001, 1, 2, ...)
-        # Build tuple of provided components
-        components_dt: list[int | datetime | None | TZInfo] = [year_or_default, month, day]
-        if hour != 0 or minute != 0 or second != 0 or microsecond != 0:
-            components_dt.extend([hour, minute, second, microsecond])
-        func_args = tuple(components_dt)
-    else:
-        # year_or_default is not None but month is None
-        # This shouldn't happen with explicit positional args, but handle gracefully
-        func_args = (year_or_default,)
+            resolved_tzinfo = getattr(args[0], 'tzinfo', None)
+    
+    # Check if datetime components were passed as keywords and merge with positional
+    if any(k in kw for k in ('year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond')):
+        # Build from keywords, using positional args as defaults
+        year = kw.pop('year', args[0] if len(args) > 0 else None)
+        month = kw.pop('month', args[1] if len(args) > 1 else None)
+        day = kw.pop('day', args[2] if len(args) > 2 else None)
+        hour = kw.pop('hour', args[3] if len(args) > 3 else 0)
+        minute = kw.pop('minute', args[4] if len(args) > 4 else 0)
+        second = kw.pop('second', args[5] if len(args) > 5 else 0)
+        microsecond = kw.pop('microsecond', args[6] if len(args) > 6 else 0)
+        
+        if year is not None and month is not None and day is not None:
+            dt_components: list[int | datetime | None | TZInfo] = [year, month, day]
+            if hour != 0 or minute != 0 or second != 0 or microsecond != 0:
+                dt_components.extend([hour, minute, second, microsecond])
+            final_args = tuple(dt_components)
+        else:
+            final_args = ()
     
     return mock_factory(
         'MockDateTime',
         MockDateTime,
         (2001, 1, 1, 0, 0, 0),
-        func_args,
+        final_args,
         kw,
         tzinfo=resolved_tzinfo,
         delta=delta,
@@ -439,10 +411,7 @@ class MockDate(MockedCurrent[date], date):
 
 
 def mock_date(
-        year_or_default: int | date | None = ...,  # type: ignore[assignment]
-        month: int | None = None,
-        day: int | None = None,
-        *,
+        *args: int | date | None,
         delta: float | None = None,
         delta_type: str = 'days',
         strict: bool = False,
@@ -489,39 +458,22 @@ def mock_date(
     The mock returned will behave exactly as the :class:`datetime.date` class
     as well as being a subclass of :class:`~testfixtures.datetime.MockDate`.
     """
-    # Build args tuple based on the parameters to match original behavior
-    args: tuple[int | date | None, ...]
+    # Handle keyword arguments by merging with positional
+    final_args = args
     
-    # Check if year, month, day were passed as keywords
-    if 'year' in kw or 'month' in kw or 'day' in kw:
-        # Extract from kw and remove them so they don't get passed twice
-        year = kw.pop('year', year_or_default if year_or_default is not ... else None)
-        month_val = kw.pop('month', month)
-        day_val = kw.pop('day', day)
+    if any(k in kw for k in ('year', 'month', 'day')):
+        # Build from keywords, using positional args as defaults
+        year = kw.pop('year', args[0] if len(args) > 0 else None)
+        month = kw.pop('month', args[1] if len(args) > 1 else None)  
+        day = kw.pop('day', args[2] if len(args) > 2 else None)
         
-        if year is not None and month_val is not None and day_val is not None:
-            args = (year, month_val, day_val)
+        if year is not None and month is not None and day is not None:
+            final_args = (year, month, day)
         else:
-            args = ()  # Will use defaults
-    elif year_or_default is ... and month is None:
-        # No positional arguments provided: mock_date()
-        args = ()
-    elif year_or_default is None and month is None:
-        # None explicitly passed as first argument: mock_date(None)
-        args = (None,)
-    elif isinstance(year_or_default, date):
-        # Single instance case: mock_date(date_instance)
-        args = (year_or_default,)
-    elif month is not None:
-        # Positional date components case: mock_date(2001, 2, 3)
-        args = (year_or_default, month, day)
-    else:
-        # year_or_default is not None but month is None
-        # This shouldn't happen with explicit positional args, but handle gracefully
-        args = (year_or_default,)
+            final_args = ()
     
     return mock_factory(
-        'MockDate', MockDate, (2001, 1, 1), args, kw,  # type: ignore[arg-type]
+        'MockDate', MockDate, (2001, 1, 1), final_args, kw,  # type: ignore[arg-type]
         delta=delta,
         delta_type=delta_type,
         strict=strict,
@@ -584,14 +536,7 @@ class MockTime(MockedCurrent[datetime], datetime):
 
 
 def mock_time(
-        year_or_default: int | datetime | None = ...,  # type: ignore[assignment]
-        month: int | None = None,
-        day: int | None = None,
-        hour: int = 0,
-        minute: int = 0,
-        second: int = 0,
-        microsecond: int = 0,
-        *args: TZInfo,
+        *args: int | datetime | None | TZInfo,
         delta: float | None = None,
         delta_type: str = 'seconds',
         **kw: int,
@@ -637,59 +582,42 @@ def mock_time(
     and :meth:`~testfixtures.datetime.MockTime.tick` methods on the mock can be used to
     control the return values.
     """
-    # Check for tzinfo passed as additional positional args or in kwargs and reject it
-    if args:
-        raise TypeError("You don't want to use tzinfo with test_time")
+    # Check for tzinfo and reject it
     if 'tzinfo' in kw:
         raise TypeError("You don't want to use tzinfo with test_time")
     
-    # Build args tuple based on the parameters to match original behavior
-    func_args: tuple[int | datetime | None, ...]
-    
-    # Check if datetime components were passed as keywords
-    if any(k in kw for k in ('year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond')):
-        # Extract from kw and remove them so they don't get passed twice
-        year = kw.pop('year', year_or_default if year_or_default is not ... else None)
-        month_val = kw.pop('month', month)
-        day_val = kw.pop('day', day)
-        hour_val = kw.pop('hour', hour)
-        minute_val = kw.pop('minute', minute)
-        second_val = kw.pop('second', second)
-        microsecond_val = kw.pop('microsecond', microsecond)
-        
-        if year is not None and month_val is not None and day_val is not None:
-            components_time: list[int | datetime | None] = [year, month_val, day_val]
-            if hour_val != 0 or minute_val != 0 or second_val != 0 or microsecond_val != 0:
-                components_time.extend([hour_val, minute_val, second_val, microsecond_val])
-            func_args = tuple(components_time)
-        else:
-            func_args = ()  # Will use defaults
-    elif year_or_default is ... and month is None:
-        # No positional arguments provided: mock_time()
-        func_args = ()
-    elif year_or_default is None and month is None:
-        # None explicitly passed as first argument: mock_time(None)
-        func_args = (None,)
-    elif isinstance(year_or_default, datetime):
-        # Single instance case: mock_time(datetime_instance)
-        # Check for tzinfo and reject it
-        if getattr(year_or_default, 'tzinfo', None):
+    # Check for tzinfo in args (8th position or later) and reject it
+    final_args = args
+    for arg in args:
+        if hasattr(arg, 'utcoffset') and not isinstance(arg, datetime):  # Check if it's a tzinfo-like object but not datetime
             raise TypeError("You don't want to use tzinfo with test_time")
-        func_args = (year_or_default,)
-    elif month is not None:
-        # Positional datetime components case: mock_time(2001, 1, 2, ...)
-        # Build tuple of provided components
-        components_tm: list[int | datetime | None] = [year_or_default, month, day]
-        if hour != 0 or minute != 0 or second != 0 or microsecond != 0:
-            components_tm.extend([hour, minute, second, microsecond])
-        func_args = tuple(components_tm)
-    else:
-        # year_or_default is not None but month is None
-        # This shouldn't happen with explicit positional args, but handle gracefully
-        func_args = (year_or_default,)
+    
+    # Check for tzinfo in datetime instances and reject
+    if len(args) == 1 and isinstance(args[0], datetime):
+        if getattr(args[0], 'tzinfo', None):
+            raise TypeError("You don't want to use tzinfo with test_time")
+    
+    # Handle keyword arguments by merging with positional  
+    if any(k in kw for k in ('year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond')):
+        # Build from keywords, using positional args as defaults
+        year = kw.pop('year', args[0] if len(args) > 0 else None)
+        month = kw.pop('month', args[1] if len(args) > 1 else None)
+        day = kw.pop('day', args[2] if len(args) > 2 else None)
+        hour = kw.pop('hour', args[3] if len(args) > 3 else 0)
+        minute = kw.pop('minute', args[4] if len(args) > 4 else 0)
+        second = kw.pop('second', args[5] if len(args) > 5 else 0)
+        microsecond = kw.pop('microsecond', args[6] if len(args) > 6 else 0)
+        
+        if year is not None and month is not None and day is not None:
+            components: list[int | datetime | None | TZInfo] = [year, month, day]
+            if hour != 0 or minute != 0 or second != 0 or microsecond != 0:
+                components.extend([hour, minute, second, microsecond])
+            final_args = tuple(components)
+        else:
+            final_args = ()
     
     return mock_factory(
-        'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), func_args, kw,  # type: ignore[arg-type]
+        'MockTime', MockTime, (2001, 1, 1, 0, 0, 0), final_args, kw,  # type: ignore[arg-type]
         delta=delta,
         delta_type=delta_type,
     )  # type: ignore[return-value]
